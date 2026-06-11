@@ -122,3 +122,90 @@ export const IconPatients = (p: IconProps) => (
     <path d="M24 18v8M20 22h8" />
   </svg>
 );
+
+/* ---- Icones d'interface (navigation, actions) ---- */
+
+export const IconDashboard = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="6" y="6" width="14" height="14" rx="3" />
+    <rect x="28" y="6" width="14" height="9" rx="3" />
+    <rect x="28" y="21" width="14" height="21" rx="3" />
+    <rect x="6" y="26" width="14" height="16" rx="3" />
+  </svg>
+);
+
+export const IconAgenda = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="7" y="9" width="34" height="32" rx="4" />
+    <path d="M7 18h34M16 5v8M32 5v8" />
+    <path d="M15 26h6M27 26h6M15 33h6" />
+  </svg>
+);
+
+export const IconFinance = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="6" y="12" width="32" height="22" rx="4" />
+    <path d="M38 19h4v8h-4" />
+    <circle cx="20" cy="23" r="4" />
+  </svg>
+);
+
+export const IconSettings = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="24" cy="24" r="6" />
+    <path d="M24 4v6M24 38v6M4 24h6M38 24h6M9 9l4 4M35 35l4 4M39 9l-4 4M13 35l-4 4" />
+  </svg>
+);
+
+export const IconBed = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M6 14v22M6 30h36v8M42 28v8" />
+    <path d="M6 24h20a8 8 0 0 1 8 6" />
+    <circle cx="15" cy="22" r="3" />
+  </svg>
+);
+
+export const IconMenu = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M8 14h32M8 24h32M8 34h32" />
+  </svg>
+);
+
+export const IconSearch = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="21" cy="21" r="13" />
+    <path d="M40 40l-8-8" />
+  </svg>
+);
+
+export const IconBell = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 20a12 12 0 0 1 24 0c0 10 4 12 4 12H8s4-2 4-12Z" />
+    <path d="M20 38a4 4 0 0 0 8 0" />
+  </svg>
+);
+
+export const IconSun = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="24" cy="24" r="8" />
+    <path d="M24 4v6M24 38v6M4 24h6M38 24h6M9 9l4 4M35 35l4 4M39 9l-4 4M13 35l-4 4" />
+  </svg>
+);
+
+export const IconMoon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M38 27a15 15 0 1 1-17-19 12 12 0 0 0 17 19Z" />
+  </svg>
+);
+
+export const IconPlus = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M24 12v24M12 24h24" />
+  </svg>
+);
+
+export const IconChevron = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M18 12l12 12-12 12" />
+  </svg>
+);
