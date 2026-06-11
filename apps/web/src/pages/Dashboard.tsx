@@ -137,28 +137,28 @@ const APPTS = [
 ];
 
 const TX = [
-  { who: 'Joseph Kabongo', via: 'M-Pesa', amount: '15 000 CDF', color: '#27AE60' },
-  { who: 'Pharmacie · Vente', via: 'Espèces USD', amount: '12,00 USD', color: '#2E37A4' },
-  { who: 'Marie Ilunga', via: 'Orange Money', amount: '8 400 CDF', color: '#EA580C' },
-  { who: 'Laboratoire · Bilan', via: 'Airtel Money', amount: '22 000 CDF', color: '#EF1E1E' },
+  { who: 'Joseph Kabongo', via: 'M-Pesa', amount: '15 000 CDF', color: '#1e8e3e' },
+  { who: 'Pharmacie · Vente', via: 'Espèces USD', amount: '12,00 USD', color: '#006400' },
+  { who: 'Marie Ilunga', via: 'Orange Money', amount: '8 400 CDF', color: '#976644' },
+  { who: 'Laboratoire · Bilan', via: 'Airtel Money', amount: '22 000 CDF', color: '#6f0002' },
 ];
 
 const BEDS = [
-  { svc: 'Médecine interne', used: 18, total: 24, color: '#2E37A4' },
-  { svc: 'Chirurgie', used: 11, total: 16, color: '#00D3C7' },
-  { svc: 'Maternité', used: 9, total: 12, color: '#DB2777' },
-  { svc: 'Pédiatrie', used: 14, total: 20, color: '#2F80ED' },
+  { svc: 'Médecine interne', used: 18, total: 24, color: '#006400' },
+  { svc: 'Chirurgie', used: 11, total: 16, color: '#018000' },
+  { svc: 'Maternité', used: 9, total: 12, color: '#976644' },
+  { svc: 'Pédiatrie', used: 14, total: 20, color: '#738f12' },
 ];
 
 const QUICK: { label: string; icon: Ico; color: string }[] = [
-  { label: 'Urgences', icon: IconUrgences, color: '#EF1E1E' },
-  { label: 'Consultation', icon: IconConsultation, color: '#2E37A4' },
-  { label: 'Maternité', icon: IconMaternite, color: '#DB2777' },
-  { label: 'Bloc', icon: IconBloc, color: '#7C3AED' },
-  { label: 'Pharmacie', icon: IconPharmacie, color: '#16A34A' },
-  { label: 'Laboratoire', icon: IconLabo, color: '#059669' },
-  { label: 'Imagerie', icon: IconImagerie, color: '#0891B2' },
-  { label: 'Caisse', icon: IconCaisse, color: '#CA8A04' },
+  { label: 'Urgences', icon: IconUrgences, color: '#6f0002' },
+  { label: 'Consultation', icon: IconConsultation, color: '#018000' },
+  { label: 'Maternité', icon: IconMaternite, color: '#bc8d65' },
+  { label: 'Bloc', icon: IconBloc, color: '#683c1f' },
+  { label: 'Pharmacie', icon: IconPharmacie, color: '#006400' },
+  { label: 'Laboratoire', icon: IconLabo, color: '#738f12' },
+  { label: 'Imagerie', icon: IconImagerie, color: '#889682' },
+  { label: 'Caisse', icon: IconCaisse, color: '#9a7b0a' },
 ];
 
 export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
@@ -166,17 +166,17 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
     <>
       <div className="page-head">
         <div>
-          <h1>Bonjour, Dr. Administrateur 👋</h1>
+          <h1>Bonjour, Dr. Administrateur</h1>
           <div className="sub">Clinique Démo · Kinshasa — voici l'activité du jour.</div>
         </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid--kpi" style={{ marginBottom: 14 }}>
-        <Kpi icon={IconPatients} color="#2E37A4" label="Patients du jour" value="86" delta="12%" up />
-        <Kpi icon={IconAgenda} color="#00D3C7" label="Rendez-vous" value="34" delta="5%" up />
-        <Kpi icon={IconBed} color="#2F80ED" label="Lits occupés" value="52 / 72" delta="3%" up />
-        <Kpi icon={IconFinance} color="#27AE60" label="Recettes du jour" value="1 240 $" delta="2%" up={false} />
+        <Kpi icon={IconPatients} color="#018000" label="Patients du jour" value="86" delta="12%" up />
+        <Kpi icon={IconAgenda} color="#976644" label="Rendez-vous" value="34" delta="5%" up />
+        <Kpi icon={IconBed} color="#738f12" label="Lits occupés" value="52 / 72" delta="3%" up />
+        <Kpi icon={IconFinance} color="#9a7b0a" label="Recettes du jour" value="1 240 $" delta="2%" up={false} />
       </div>
 
       {/* Recettes + Rendez-vous */}
@@ -218,10 +218,10 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
           <div className="card__body">
             <Donut
               data={[
-                { label: 'Espèces (CDF/USD)', value: 42, color: '#2E37A4' },
-                { label: 'M-Pesa', value: 28, color: '#27AE60' },
-                { label: 'Orange Money', value: 18, color: '#EA580C' },
-                { label: 'Airtel Money', value: 12, color: '#EF1E1E' },
+                { label: 'Espèces (CDF/USD)', value: 42, color: '#006400' },
+                { label: 'M-Pesa', value: 28, color: '#32cd32' },
+                { label: 'Orange Money', value: 18, color: '#976644' },
+                { label: 'Airtel Money', value: 12, color: '#6f0002' },
               ]}
             />
           </div>

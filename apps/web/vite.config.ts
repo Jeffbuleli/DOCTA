@@ -14,8 +14,8 @@ export default defineConfig({
         short_name: 'Docta',
         description: "SIH open source pour l'hopital africain moderne",
         lang: 'fr',
-        theme_color: '#2E37A4',
-        background_color: '#F5F6F8',
+        theme_color: '#018000',
+        background_color: '#F5F7F1',
         display: 'standalone',
         start_url: '/',
         icons: [

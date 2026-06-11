@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('docta-theme', theme);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', theme === 'dark' ? '#03041A' : '#2E37A4');
+      meta.setAttribute('content', theme === 'dark' ? '#0E1711' : '#018000');
     }
   }, [theme]);
 
