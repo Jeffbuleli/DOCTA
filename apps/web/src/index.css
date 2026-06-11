@@ -579,6 +579,138 @@ button {
 }
 
 /* ===========================================================================
+   AUTH / LOGIN
+   =========================================================================== */
+.auth {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px;
+  background: radial-gradient(
+      1200px 600px at 50% -10%,
+      var(--primary-soft),
+      transparent 60%
+    ),
+    var(--bg);
+}
+.auth__card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 26px 22px;
+}
+.auth__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 22px;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.auth__brand .brand-name {
+  color: var(--heading);
+}
+.auth__tag {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+.field {
+  margin-bottom: 14px;
+}
+.field > label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--heading);
+  margin-bottom: 6px;
+}
+.input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--heading);
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+.input::placeholder {
+  color: var(--muted);
+}
+.btn-primary {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary:hover {
+  background: var(--primary-600);
+}
+.btn-primary:disabled {
+  opacity: 0.7;
+}
+.auth__error {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.auth__hint {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fullscreen-center {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+/* ===========================================================================
    DESKTOP (>= 1024px)
    =========================================================================== */
 @media (min-width: 420px) {

@@ -209,3 +209,10 @@ export const IconChevron = (p: IconProps) => (
     <path d="M18 12l12 12-12 12" />
   </svg>
 );
+
+export const IconLogout = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M19 8V6a3 3 0 0 0-3-3H9a3 3 0 0 0-3 3v36a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3v-2" />
+    <path d="M28 24H42M36 18l6 6-6 6" />
+  </svg>
+);

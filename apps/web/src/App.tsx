@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppShell } from './AppShell';
 import { Dashboard } from './pages/Dashboard';
 import { Placeholder } from './pages/Placeholder';
+import { Login } from './pages/Login';
+import { useAuth } from './auth';
+import { api } from './api';
 import type { PageKey } from './nav';
 import {
   IconPatients,
@@ -14,8 +17,7 @@ import {
   IconSettings,
 } from './icons';
 
-// Taux du jour (sera relie a l'API /api/currency/rate lors du branchement auth).
-const CDF_PER_USD = 2800;
+const FALLBACK_RATE = 2800;
 
 const PLACEHOLDERS: Record<
   Exclude<PageKey, 'dashboard'>,
@@ -32,12 +34,45 @@ const PLACEHOLDERS: Record<
 };
 
 export function App() {
+  const { user, loading, logout } = useAuth();
   const [page, setPage] = useState<PageKey>('dashboard');
+  const [rate, setRate] = useState(FALLBACK_RATE);
+
+  // Taux du jour live, une fois connecte.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    api
+      .currencyRate()
+      .then((r) => {
+        if (!cancelled) setRate(Number(r.cdfPerUsd) || FALLBACK_RATE);
+      })
+      .catch(() => {
+        /* garde le fallback si pas de taux defini */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  if (loading) {
+    return <div className="fullscreen-center">Chargement…</div>;
+  }
+
+  if (!user) {
+    return <Login />;
+  }
 
   return (
-    <AppShell page={page} setPage={setPage} cdfPerUsd={CDF_PER_USD}>
+    <AppShell
+      page={page}
+      setPage={setPage}
+      cdfPerUsd={rate}
+      userName={user.fullName ?? user.email}
+      onLogout={logout}
+    >
       {page === 'dashboard' ? (
-        <Dashboard cdfPerUsd={CDF_PER_USD} />
+        <Dashboard cdfPerUsd={rate} />
       ) : (
         <Placeholder {...PLACEHOLDERS[page]} />
       )}

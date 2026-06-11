@@ -8,7 +8,18 @@ import {
   IconSun,
   IconMoon,
   IconPlus,
+  IconLogout,
 } from './icons';
+
+function initials(name?: string) {
+  if (!name) return 'DR';
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join('');
+}
 
 const Brand = ({ className }: { className: string }) => (
   <div className={className}>
@@ -34,9 +45,11 @@ const Brand = ({ className }: { className: string }) => (
 function NavList({
   page,
   go,
+  onLogout,
 }: {
   page: PageKey;
   go: (p: PageKey) => void;
+  onLogout: () => void;
 }) {
   return (
     <nav className="nav">
@@ -58,6 +71,12 @@ function NavList({
           })}
         </div>
       ))}
+      <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+        <button className="nav__item" onClick={onLogout}>
+          <IconLogout width={20} height={20} />
+          Déconnexion
+        </button>
+      </div>
     </nav>
   );
 }
@@ -66,11 +85,15 @@ export function AppShell({
   page,
   setPage,
   cdfPerUsd,
+  userName,
+  onLogout,
   children,
 }: {
   page: PageKey;
   setPage: (p: PageKey) => void;
   cdfPerUsd: number;
+  userName?: string;
+  onLogout: () => void;
   children: ReactNode;
 }) {
   const { theme, toggle } = useTheme();
@@ -86,7 +109,7 @@ export function AppShell({
       {/* Sidebar desktop */}
       <aside className="sidebar">
         <Brand className="sidebar__brand" />
-        <NavList page={page} go={go} />
+        <NavList page={page} go={go} onLogout={onLogout} />
       </aside>
 
       {/* Drawer mobile */}
@@ -95,7 +118,7 @@ export function AppShell({
           <div className="drawer-overlay" onClick={() => setDrawer(false)} />
           <aside className="drawer">
             <Brand className="sidebar__brand" />
-            <NavList page={page} go={go} />
+            <NavList page={page} go={go} onLogout={onLogout} />
           </aside>
         </>
       )}
@@ -139,8 +162,8 @@ export function AppShell({
             <IconBell width={19} height={19} />
             <span className="badge-dot" />
           </button>
-          <div className="avatar" title="Administrateur Demo">
-            AD
+          <div className="avatar" title={userName ?? 'Utilisateur'}>
+            {initials(userName)}
           </div>
         </header>
 
