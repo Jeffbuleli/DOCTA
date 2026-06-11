@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from './AppShell';
 import { Dashboard } from './pages/Dashboard';
+import { Patients } from './pages/Patients';
 import { Placeholder } from './pages/Placeholder';
 import { Login } from './pages/Login';
 import { useAuth } from './auth';
@@ -73,6 +74,8 @@ export function App() {
     >
       {page === 'dashboard' ? (
         <Dashboard cdfPerUsd={rate} />
+      ) : page === 'patients' ? (
+        <Patients />
       ) : (
         <Placeholder {...PLACEHOLDERS[page]} />
       )}

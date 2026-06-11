@@ -579,6 +579,216 @@ button {
 }
 
 /* ===========================================================================
+   MODULE PATIENTS (liste, recherche, modale)
+   =========================================================================== */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.search {
+  position: relative;
+  flex: 1;
+}
+.search svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+.search .input {
+  padding-left: 40px;
+  height: 44px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--heading);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--surface-2);
+}
+.btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.btn--primary:hover {
+  background: var(--primary-600);
+}
+.btn--ghost {
+  border-color: transparent;
+  background: transparent;
+}
+.hide-xs {
+  display: none;
+}
+@media (min-width: 400px) {
+  .hide-xs {
+    display: inline;
+  }
+}
+
+.pt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.pt-row:last-child {
+  border-bottom: none;
+}
+.pt-row:hover {
+  background: var(--surface-2);
+}
+.pt-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 14px;
+  flex: none;
+}
+.pt-avatar--m {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+.pt-avatar--f {
+  color: var(--secondary);
+  background: var(--secondary-soft);
+}
+.pt-main {
+  flex: 1;
+  min-width: 0;
+}
+.pt-name {
+  color: var(--heading);
+  font-weight: 700;
+  font-size: 14.5px;
+}
+.pt-meta {
+  color: var(--muted);
+  font-size: 12.5px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mrn {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 44px 20px;
+  color: var(--muted);
+}
+.empty .ic {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+/* modale */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(13, 23, 16, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  max-height: 92vh;
+  overflow-y: auto;
+  animation: sheetUp 0.2s ease;
+}
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+.modal__head h3 {
+  font-size: 16px;
+}
+.modal__body {
+  padding: 18px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-grid .col-2 {
+  grid-column: span 2;
+}
+.select {
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--heading);
+  font: inherit;
+  font-size: 15px;
+}
+
+@media (min-width: 600px) {
+  .modal-overlay {
+    align-items: center;
+  }
+  .modal {
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ===========================================================================
    AUTH / LOGIN
    =========================================================================== */
 .auth {

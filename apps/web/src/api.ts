@@ -64,6 +64,27 @@ export interface ExchangeRate {
   date: string;
 }
 
+export type Sex = 'M' | 'F';
+export interface Patient {
+  id: string;
+  mrn: string;
+  firstName: string;
+  lastName: string;
+  sex: Sex | null;
+  birthDate: string | null;
+  phone: string | null;
+  address: string | null;
+  createdAt: string;
+}
+export interface CreatePatientInput {
+  firstName: string;
+  lastName: string;
+  sex?: Sex;
+  birthDate?: string;
+  phone?: string;
+  address?: string;
+}
+
 /* ---- Endpoints ---- */
 export const api = {
   login: (tenantSlug: string, email: string, password: string) =>
@@ -89,4 +110,17 @@ export const api = {
   me: () => request<AuthUser>('/auth/me'),
 
   currencyRate: () => request<ExchangeRate>('/currency/rate'),
+
+  patients: {
+    list: (search?: string) =>
+      request<Patient[]>(
+        `/patients${search ? `?search=${encodeURIComponent(search)}` : ''}`,
+      ),
+    get: (id: string) => request<Patient>(`/patients/${id}`),
+    create: (data: CreatePatientInput) =>
+      request<Patient>('/patients', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+  },
 };
