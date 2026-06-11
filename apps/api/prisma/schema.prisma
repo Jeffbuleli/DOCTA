@@ -1,0 +1,102 @@
+// Docta — schema Prisma (socle)
+// Multi-tenant (etablissement) + RBAC + bi-devise CDF/USD + patient de base.
+// Les modules cliniques (hospitalisation, bloc, pharmacie...) viendront s'y greffer.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Etablissement = locataire (tenant). Chaque donnee est rattachee a un tenant.
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  city      String?
+  country   String   @default("CD") // RD Congo par defaut
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  patients      Patient[]
+  exchangeRates ExchangeRate[]
+}
+
+enum Role {
+  SUPERADMIN // exploitant de la plateforme
+  ADMIN // directeur / medecin-chef
+  DOCTOR
+  NURSE
+  RECEPTION
+  CASHIER
+  PHARMACIST
+  LAB
+  IMAGING
+  LOGISTICS
+  HR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  email        String
+  passwordHash String
+  fullName     String
+  role         Role     @default(RECEPTION)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+enum Currency {
+  CDF // Franc congolais
+  USD // Dollar americain
+}
+
+/// Taux du jour : combien de CDF pour 1 USD (ex: 2800).
+model ExchangeRate {
+  id        String   @id @default(cuid())
+  tenantId  String
+  date      DateTime @default(now())
+  cdfPerUsd Decimal  @db.Decimal(14, 4)
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, date])
+}
+
+enum Sex {
+  M
+  F
+}
+
+/// Patient — identite de base (le dossier clinique complet viendra ensuite).
+model Patient {
+  id          String    @id @default(cuid())
+  tenantId    String
+  mrn         String // numero de dossier (Medical Record Number) interne
+  firstName   String
+  lastName    String
+  sex         Sex?
+  birthDate   DateTime?
+  phone       String?
+  address     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, mrn])
+  @@index([tenantId, lastName])
+}
