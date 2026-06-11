@@ -85,6 +85,31 @@ export interface CreatePatientInput {
   address?: string;
 }
 
+export interface WardOccupancy {
+  id: string;
+  name: string;
+  total: number;
+  occupied: number;
+  available: number;
+  maintenance: number;
+}
+export interface AvailableBed {
+  id: string;
+  label: string;
+  roomName: string;
+  wardId: string;
+  wardName: string;
+}
+export interface Admission {
+  id: string;
+  status: string;
+  reason: string | null;
+  admittedAt: string;
+  patient: Patient;
+  ward: { id: string; name: string };
+  bed: { id: string; label: string; room: { name: string } };
+}
+
 /* ---- Endpoints ---- */
 export const api = {
   login: (tenantSlug: string, email: string, password: string) =>
@@ -121,6 +146,31 @@ export const api = {
       request<Patient>('/patients', {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+  },
+
+  hospital: {
+    wards: () => request<WardOccupancy[]>('/hospital/wards'),
+    beds: (wardId?: string) =>
+      request<AvailableBed[]>(
+        `/hospital/beds${wardId ? `?wardId=${wardId}` : ''}`,
+      ),
+    admissions: () => request<Admission[]>('/hospital/admissions'),
+    setupDemo: () =>
+      request<{ created: boolean }>('/hospital/setup-demo', { method: 'POST' }),
+    admit: (patientId: string, bedId: string, reason?: string) =>
+      request<Admission>('/hospital/admissions', {
+        method: 'POST',
+        body: JSON.stringify({ patientId, bedId, reason }),
+      }),
+    transfer: (admissionId: string, bedId: string) =>
+      request<Admission>(`/hospital/admissions/${admissionId}/transfer`, {
+        method: 'PATCH',
+        body: JSON.stringify({ bedId }),
+      }),
+    discharge: (admissionId: string) =>
+      request<unknown>(`/hospital/admissions/${admissionId}/discharge`, {
+        method: 'PATCH',
       }),
   },
 };

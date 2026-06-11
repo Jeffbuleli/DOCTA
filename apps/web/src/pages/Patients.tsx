@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, type Patient, type Sex } from '../api';
 import { IconSearch, IconPlus, IconPatients } from '../icons';
+import { AdmitModal } from '../components/AdmitModal';
 
 function initials(p: Patient) {
   return (p.firstName[0] ?? '') + (p.lastName[0] ?? '');
@@ -214,6 +215,8 @@ function PatientForm({
 
 /* ---- Fiche patient ---- */
 function PatientDetail({ patient: p, onClose }: { patient: Patient; onClose: () => void }) {
+  const [admit, setAdmit] = useState(false);
+  const [done, setDone] = useState(false);
   const Row = ({ k, v }: { k: string; v: string }) => (
     <div className="list__row">
       <span className="list__main">
@@ -247,11 +250,32 @@ function PatientDetail({ patient: p, onClose }: { patient: Patient; onClose: () 
             <Row k="Téléphone" v={p.phone || '—'} />
             <Row k="Adresse" v={p.address || '—'} />
           </div>
-          <button className="btn btn--primary" style={{ width: '100%', marginTop: 16 }} disabled title="Bientôt">
-            Admettre (bientôt)
-          </button>
+          {done ? (
+            <div className="badge badge--success" style={{ width: '100%', justifyContent: 'center', marginTop: 16, padding: '12px' }}>
+              Patient admis en hospitalisation
+            </div>
+          ) : (
+            <button
+              className="btn btn--primary"
+              style={{ width: '100%', marginTop: 16 }}
+              onClick={() => setAdmit(true)}
+            >
+              Admettre en hospitalisation
+            </button>
+          )}
         </div>
       </div>
+
+      {admit && (
+        <AdmitModal
+          patient={p}
+          onClose={() => setAdmit(false)}
+          onAdmitted={() => {
+            setAdmit(false);
+            setDone(true);
+          }}
+        />
+      )}
     </div>
   );
 }

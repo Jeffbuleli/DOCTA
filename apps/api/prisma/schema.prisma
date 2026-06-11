@@ -25,6 +25,7 @@ model Tenant {
   users         User[]
   patients      Patient[]
   exchangeRates ExchangeRate[]
+  wards         Ward[]
 }
 
 enum Role {
@@ -95,8 +96,86 @@ model Patient {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  admissions Admission[]
 
   @@unique([tenantId, mrn])
   @@index([tenantId, lastName])
+}
+
+/// =====================  HOSPITALISATION  =====================
+
+enum BedStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum AdmissionStatus {
+  ACTIVE
+  DISCHARGED
+  TRANSFERRED
+}
+
+/// Service / unite d'hospitalisation (Medecine interne, Chirurgie, Maternite...)
+model Ward {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  createdAt DateTime @default(now())
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rooms      Room[]
+  admissions Admission[]
+
+  @@index([tenantId])
+}
+
+/// Salle rattachee a un service.
+model Room {
+  id       String @id @default(cuid())
+  tenantId String
+  wardId   String
+  name     String
+
+  ward Ward  @relation(fields: [wardId], references: [id], onDelete: Cascade)
+  beds Bed[]
+
+  @@index([tenantId])
+  @@index([wardId])
+}
+
+/// Lit dans une salle.
+model Bed {
+  id       String    @id @default(cuid())
+  tenantId String
+  roomId   String
+  label    String
+  status   BedStatus @default(AVAILABLE)
+
+  room       Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  admissions Admission[]
+
+  @@index([tenantId])
+  @@index([roomId])
+}
+
+/// Sejour d'un patient : admission -> (transfert) -> sortie.
+model Admission {
+  id           String          @id @default(cuid())
+  tenantId     String
+  patientId    String
+  wardId       String
+  bedId        String
+  status       AdmissionStatus @default(ACTIVE)
+  reason       String?
+  admittedAt   DateTime        @default(now())
+  dischargedAt DateTime?
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  ward    Ward    @relation(fields: [wardId], references: [id])
+  bed     Bed     @relation(fields: [bedId], references: [id])
+
+  @@index([tenantId, status])
+  @@index([patientId])
 }
