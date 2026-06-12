@@ -9,11 +9,14 @@ import { PatientsModule } from './patients/patients.module';
 import { HospitalModule } from './hospital/hospital.module';
 import { BillingModule } from './billing/billing.module';
 import { StatsModule } from './stats/stats.module';
+import { MailModule } from './mail/mail.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    MailModule,
     AuthModule,
     UsersModule,
     CurrencyModule,
@@ -21,6 +24,7 @@ import { StatsModule } from './stats/stats.module';
     HospitalModule,
     BillingModule,
     StatsModule,
+    AccountModule,
   ],
   controllers: [HealthController],
 })
