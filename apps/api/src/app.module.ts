@@ -13,6 +13,7 @@ import { MailModule } from './mail/mail.module';
 import { AccountModule } from './account/account.module';
 import { PublicModule } from './public/public.module';
 import { RecordsModule } from './records/records.module';
+import { MembershipsModule } from './memberships/memberships.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { RecordsModule } from './records/records.module';
     AccountModule,
     PublicModule,
     RecordsModule,
+    MembershipsModule,
   ],
   controllers: [HealthController],
 })

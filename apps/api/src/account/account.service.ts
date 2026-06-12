@@ -10,6 +10,7 @@ import { Account } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { MembershipsService } from '../memberships/memberships.service';
 import { AccountLoginDto, AccountRegisterDto } from './dto';
 
 function publicAccount(a: Account) {
@@ -29,6 +30,7 @@ export class AccountService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly mail: MailService,
+    private readonly memberships: MembershipsService,
   ) {}
 
   private appUrl(): string {
@@ -67,6 +69,7 @@ export class AccountService {
       },
     });
 
+    await this.memberships.claimInvites(account.id, account.email);
     const devLink = await this.sendVerification(account);
     return {
       accessToken: this.accessToken(account),
@@ -83,6 +86,7 @@ export class AccountService {
     const ok = await bcrypt.compare(dto.password, account.passwordHash);
     if (!ok) throw new UnauthorizedException('Identifiants invalides');
 
+    await this.memberships.claimInvites(account.id, account.email);
     return {
       accessToken: this.accessToken(account),
       account: publicAccount(account),

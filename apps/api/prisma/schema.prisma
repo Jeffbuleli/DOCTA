@@ -32,6 +32,7 @@ model Tenant {
   patients      Patient[]
   exchangeRates ExchangeRate[]
   wards         Ward[]
+  memberships   Membership[]
 }
 
 enum Role {
@@ -80,11 +81,44 @@ model Account {
   fullName      String
   phone         String?
   emailVerified Boolean  @default(false)
+  // Profil professionnel (type LinkedIn)
+  headline      String? // ex. "Medecin generaliste"
+  bio           String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   links       AccountPatientLink[]
   shareGrants ShareGrant[]
+  memberships Membership[]
+}
+
+enum MembershipStatus {
+  PENDING // invitation envoyee, en attente d'acceptation
+  ACTIVE // appartenance en cours
+  ENDED // contrat termine (apparait en experience passee)
+}
+
+/// Appartenance / emploi : relie une personne (Account) a un hopital (Tenant),
+/// avec un role, un titre et une periode. Une personne peut en avoir plusieurs.
+model Membership {
+  id           String           @id @default(cuid())
+  tenantId     String
+  accountId    String? // null tant que la personne invitee n'a pas encore de compte
+  invitedEmail String? // e-mail invite (pour rattacher au compte plus tard)
+  role         Role
+  title        String? // ex. "Medecin traitant", "Gynecologue consultant"
+  status       MembershipStatus @default(PENDING)
+  startDate    DateTime?
+  endDate      DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  account Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([accountId, status])
+  @@index([invitedEmail])
 }
 
 /// Taux du jour : combien de CDF pour 1 USD (ex: 2800).
