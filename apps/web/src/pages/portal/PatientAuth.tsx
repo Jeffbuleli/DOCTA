@@ -112,7 +112,7 @@ export function PatientAuth() {
           {mode !== 'login' && (
             <button type="button" className="linklike" onClick={() => { setMode('login'); setError(''); setNotice(''); }}>{t('pauth.haveAccount')}</button>
           )}
-          <button type="button" className="linklike" onClick={() => navigate('/')}>{t('pauth.back')}</button>
+          <button type="button" className="linklike" onClick={() => navigate('/hopitaux')}>{t('dir.title')}</button>
         </div>
       </form>
       <Footer />

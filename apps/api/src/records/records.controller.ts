@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CurrentUser, AuthUser } from '../auth/current-user.decorator';
 import { AccountJwtGuard } from '../account/account-jwt.guard';
+import { MembershipGuard } from '../common/membership.guard';
 import { CurrentAccount, AuthAccount } from '../account/current-account.decorator';
 import { RecordsService } from './records.service';
 import { LinkCodeDto, LinkDto, RedeemDto } from './dto';
@@ -32,7 +32,7 @@ export class AccountRecordsController {
 }
 
 /** Cote HOPITAL (personnel). */
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(AccountJwtGuard, MembershipGuard, RolesGuard)
 @Controller('records')
 export class StaffRecordsController {
   constructor(private readonly records: RecordsService) {}

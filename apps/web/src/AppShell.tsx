@@ -47,11 +47,11 @@ const Brand = ({ className }: { className: string }) => (
 function NavList({
   page,
   go,
-  onLogout,
+  onExit,
 }: {
   page: PageKey;
   go: (p: PageKey) => void;
-  onLogout: () => void;
+  onExit: () => void;
 }) {
   const { t } = useI18n();
   return (
@@ -75,9 +75,9 @@ function NavList({
         </div>
       ))}
       <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-        <button className="nav__item" onClick={onLogout}>
+        <button className="nav__item" onClick={onExit}>
           <IconLogout width={20} height={20} />
-          {t('nav.logout')}
+          {t('nav.exitHospital')}
         </button>
       </div>
     </nav>
@@ -89,14 +89,16 @@ export function AppShell({
   setPage,
   cdfPerUsd,
   userName,
-  onLogout,
+  onExit,
+  hospitalName,
   children,
 }: {
   page: PageKey;
   setPage: (p: PageKey) => void;
   cdfPerUsd: number;
   userName?: string;
-  onLogout: () => void;
+  hospitalName?: string;
+  onExit: () => void;
   children: ReactNode;
 }) {
   const { theme, toggle } = useTheme();
@@ -113,7 +115,7 @@ export function AppShell({
       {/* Sidebar desktop */}
       <aside className="sidebar">
         <Brand className="sidebar__brand" />
-        <NavList page={page} go={go} onLogout={onLogout} />
+        <NavList page={page} go={go} onExit={onExit} />
       </aside>
 
       {/* Drawer mobile */}
@@ -122,7 +124,7 @@ export function AppShell({
           <div className="drawer-overlay" onClick={() => setDrawer(false)} />
           <aside className="drawer">
             <Brand className="sidebar__brand" />
-            <NavList page={page} go={go} onLogout={onLogout} />
+            <NavList page={page} go={go} onExit={onExit} />
           </aside>
         </>
       )}
@@ -139,6 +141,7 @@ export function AppShell({
           </button>
 
           <Brand className="topbar__brand" />
+          {hospitalName && <span className="hospital-chip">{hospitalName}</span>}
 
           <div className="topbar__spacer" />
 

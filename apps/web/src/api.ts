@@ -2,19 +2,21 @@
 // (/api -> http://localhost:3000). En prod, definir VITE_API_URL.
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '';
 
-const TOKEN_KEY = 'docta-token';
 const ACCOUNT_TOKEN_KEY = 'docta-account-token';
+const ACTIVE_TENANT_KEY = 'docta-active-tenant';
 
-export const tokenStore = {
-  get: () => localStorage.getItem(TOKEN_KEY),
-  set: (t: string) => localStorage.setItem(TOKEN_KEY, t),
-  clear: () => localStorage.removeItem(TOKEN_KEY),
-};
-
+// Token unique de la personne (identite globale).
 export const accountTokenStore = {
   get: () => localStorage.getItem(ACCOUNT_TOKEN_KEY),
   set: (t: string) => localStorage.setItem(ACCOUNT_TOKEN_KEY, t),
   clear: () => localStorage.removeItem(ACCOUNT_TOKEN_KEY),
+};
+
+// Hopital actif (contexte "personnel") — envoye en en-tete X-Tenant.
+export const activeTenantStore = {
+  get: () => localStorage.getItem(ACTIVE_TENANT_KEY),
+  set: (id: string) => localStorage.setItem(ACTIVE_TENANT_KEY, id),
+  clear: () => localStorage.removeItem(ACTIVE_TENANT_KEY),
 };
 
 export class ApiError extends Error {
@@ -27,15 +29,19 @@ export class ApiError extends Error {
 
 async function request<T>(
   path: string,
-  options: RequestInit & { auth?: boolean; tokenKind?: 'staff' | 'account' } = {},
+  options: RequestInit & { auth?: boolean; tenant?: boolean } = {},
 ): Promise<T> {
-  const { auth = true, tokenKind = 'staff', headers, ...rest } = options;
+  const { auth = true, tenant = false, headers, ...rest } = options;
   const h = new Headers(headers);
   h.set('Content-Type', 'application/json');
   if (auth) {
-    const store = tokenKind === 'account' ? accountTokenStore : tokenStore;
-    const t = store.get();
+    const t = accountTokenStore.get();
     if (t) h.set('Authorization', `Bearer ${t}`);
+  }
+  // Appels "personnel" : preciser l'hopital actif.
+  if (tenant) {
+    const tid = activeTenantStore.get();
+    if (tid) h.set('X-Tenant', tid);
   }
 
   const res = await fetch(`${BASE}/api${path}`, { ...rest, headers: h });
@@ -187,6 +193,46 @@ export interface AccountAuthResponse {
   devLink?: string;
 }
 
+export type MembershipStatus = 'PENDING' | 'ACTIVE' | 'ENDED';
+export interface Membership {
+  id: string;
+  tenantId: string;
+  role: string;
+  title: string | null;
+  status: MembershipStatus;
+  startDate: string | null;
+  endDate: string | null;
+  tenant: { id: string; name: string; slug: string; city: string | null };
+}
+export interface HospitalCreated {
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+}
+export interface MemberRow {
+  id: string;
+  role: string;
+  title: string | null;
+  status: MembershipStatus;
+  startDate: string | null;
+  endDate: string | null;
+  invitedEmail: string | null;
+  account: { id: string; fullName: string; email: string; headline: string | null } | null;
+}
+export interface PublicProfile {
+  account: { id: string; fullName: string; headline: string | null; bio: string | null };
+  experience: {
+    hospital: string;
+    city: string | null;
+    role: string;
+    title: string | null;
+    status: MembershipStatus;
+    startDate: string | null;
+    endDate: string | null;
+  }[];
+}
+
 export interface AdmissionSummary {
   ward: string;
   bed: string;
@@ -233,70 +279,54 @@ export interface HospitalListing {
 
 /* ---- Endpoints ---- */
 export const api = {
-  login: (tenantSlug: string, email: string, password: string) =>
-    request<AuthResponse>('/auth/login', {
-      method: 'POST',
-      auth: false,
-      body: JSON.stringify({ tenantSlug, email, password }),
-    }),
-
-  register: (data: {
-    tenantName: string;
-    fullName: string;
-    email: string;
-    password: string;
-    city?: string;
-  }) =>
-    request<AuthResponse>('/auth/register', {
-      method: 'POST',
-      auth: false,
-      body: JSON.stringify(data),
-    }),
-
-  me: () => request<AuthUser>('/auth/me'),
-
-  currencyRate: () => request<ExchangeRate>('/currency/rate'),
+  currencyRate: () => request<ExchangeRate>('/currency/rate', { tenant: true }),
 
   patients: {
     list: (search?: string) =>
       request<Patient[]>(
         `/patients${search ? `?search=${encodeURIComponent(search)}` : ''}`,
+        { tenant: true },
       ),
-    get: (id: string) => request<Patient>(`/patients/${id}`),
+    get: (id: string) => request<Patient>(`/patients/${id}`, { tenant: true }),
     create: (data: CreatePatientInput) =>
       request<Patient>('/patients', {
         method: 'POST',
+        tenant: true,
         body: JSON.stringify(data),
       }),
   },
 
   hospital: {
-    wards: () => request<WardOccupancy[]>('/hospital/wards'),
+    wards: () => request<WardOccupancy[]>('/hospital/wards', { tenant: true }),
     beds: (wardId?: string) =>
       request<AvailableBed[]>(
         `/hospital/beds${wardId ? `?wardId=${wardId}` : ''}`,
+        { tenant: true },
       ),
-    admissions: () => request<Admission[]>('/hospital/admissions'),
+    admissions: () => request<Admission[]>('/hospital/admissions', { tenant: true }),
     setupDemo: () =>
-      request<{ created: boolean }>('/hospital/setup-demo', { method: 'POST' }),
+      request<{ created: boolean }>('/hospital/setup-demo', { method: 'POST', tenant: true }),
     admit: (patientId: string, bedId: string, reason?: string) =>
       request<Admission>('/hospital/admissions', {
         method: 'POST',
+        tenant: true,
         body: JSON.stringify({ patientId, bedId, reason }),
       }),
     transfer: (admissionId: string, bedId: string) =>
       request<Admission>(`/hospital/admissions/${admissionId}/transfer`, {
         method: 'PATCH',
+        tenant: true,
         body: JSON.stringify({ bedId }),
       }),
     discharge: (admissionId: string) =>
       request<unknown>(`/hospital/admissions/${admissionId}/discharge`, {
         method: 'PATCH',
+        tenant: true,
       }),
   },
 
   stats: {
-    dashboard: () => request<DashboardStats>('/stats/dashboard'),
+    dashboard: () => request<DashboardStats>('/stats/dashboard', { tenant: true }),
   },
 
   invoices: {
@@ -305,9 +335,9 @@ export const api = {
       if (status) p.set('status', status);
       if (search) p.set('search', search);
       const qs = p.toString();
-      return request<Invoice[]>(`/invoices${qs ? `?${qs}` : ''}`);
+      return request<Invoice[]>(`/invoices${qs ? `?${qs}` : ''}`, { tenant: true });
     },
-    get: (id: string) => request<Invoice>(`/invoices/${id}`),
+    get: (id: string) => request<Invoice>(`/invoices/${id}`, { tenant: true }),
     create: (data: {
       patientId?: string;
       currency: Currency;
@@ -315,6 +345,7 @@ export const api = {
     }) =>
       request<Invoice>('/invoices', {
         method: 'POST',
+        tenant: true,
         body: JSON.stringify(data),
       }),
     pay: (
@@ -328,6 +359,7 @@ export const api = {
     ) =>
       request<Invoice>(`/invoices/${id}/payments`, {
         method: 'POST',
+        tenant: true,
         body: JSON.stringify(data),
       }),
   },
@@ -350,7 +382,7 @@ export const api = {
         auth: false,
         body: JSON.stringify({ email, password }),
       }),
-    me: () => request<PublicAccount>('/account/me', { tokenKind: 'account' }),
+    me: () => request<PublicAccount>('/account/me'),
     verifyEmail: (token: string) =>
       request<{ verified: boolean }>('/account/verify-email', {
         method: 'POST',
@@ -372,33 +404,66 @@ export const api = {
     resendVerification: () =>
       request<{ sent: boolean; alreadyVerified?: boolean }>(
         '/account/resend-verification',
-        { method: 'POST', tokenKind: 'account' },
+        { method: 'POST' },
       ),
+  },
+
+  me: {
+    memberships: () => request<Membership[]>('/me/memberships'),
+    createHospital: (data: {
+      name: string;
+      city?: string;
+      address?: string;
+      phone?: string;
+      latitude?: number;
+      longitude?: number;
+    }) =>
+      request<HospitalCreated>('/me/hospitals', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    accept: (id: string) =>
+      request<Membership>(`/me/memberships/${id}/accept`, { method: 'POST' }),
+    decline: (id: string) =>
+      request<{ declined: boolean }>(`/me/memberships/${id}/decline`, { method: 'POST' }),
+    end: (id: string) =>
+      request<Membership>(`/me/memberships/${id}/end`, { method: 'POST' }),
+    invite: (tenantId: string, data: { email: string; role: string; title?: string }) =>
+      request<MemberRow>(`/me/hospitals/${tenantId}/invite`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    members: (tenantId: string) =>
+      request<MemberRow[]>(`/me/hospitals/${tenantId}/members`),
+    updateProfile: (data: { headline?: string; bio?: string }) =>
+      request<unknown>('/me/profile', { method: 'PATCH', body: JSON.stringify(data) }),
+    profile: (accountId: string) =>
+      request<PublicProfile>(`/public/profile/${accountId}`, { auth: false }),
   },
 
   records: {
     // cote patient (compte)
-    list: () => request<RecordSummary>('/account/records', { tokenKind: 'account' }),
+    list: () => request<RecordSummary>('/account/records'),
     link: (code: string) =>
       request<{ linked: boolean }>('/account/records/link', {
         method: 'POST',
-        tokenKind: 'account',
         body: JSON.stringify({ code }),
       }),
     share: () =>
       request<ShareCode>('/account/records/share', {
         method: 'POST',
-        tokenKind: 'account',
       }),
     // cote personnel
     linkCode: (patientId: string) =>
       request<ShareCode>('/records/link-code', {
         method: 'POST',
+        tenant: true,
         body: JSON.stringify({ patientId }),
       }),
     redeem: (code: string) =>
       request<RecordSummary>('/records/redeem', {
         method: 'POST',
+        tenant: true,
         body: JSON.stringify({ code }),
       }),
   },
