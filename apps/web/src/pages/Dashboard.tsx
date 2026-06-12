@@ -1,6 +1,5 @@
 import {
   IconPatients,
-  IconAgenda,
   IconBed,
   IconFinance,
   IconUrgences,
@@ -12,8 +11,10 @@ import {
   IconCaisse,
   IconBloc,
 } from '../icons';
-import type { ComponentType, SVGProps } from 'react';
+import { useEffect, useState, type ComponentType, type SVGProps } from 'react';
 import { useI18n } from '../i18n';
+import { api, type DashboardStats, type WardOccupancy } from '../api';
+import { money } from './Caisse';
 
 type Ico = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -23,15 +24,13 @@ function Kpi({
   color,
   label,
   value,
-  delta,
-  up,
+  sub,
 }: {
   icon: Ico;
   color: string;
   label: string;
   value: string;
-  delta: string;
-  up: boolean;
+  sub?: string;
 }) {
   return (
     <div className="kpi">
@@ -42,9 +41,7 @@ function Kpi({
         >
           <Icon width={24} height={24} />
         </div>
-        <span className={`kpi__delta ${up ? 'up' : 'down'}`}>
-          {up ? '▲' : '▼'} {delta}
-        </span>
+        {sub && <span className="kpi__delta up">{sub}</span>}
       </div>
       <div className="kpi__label">{label}</div>
       <div className="kpi__value">{value}</div>
@@ -145,12 +142,7 @@ const TX = [
   { who: 'Laboratoire · Bilan', via: 'Airtel Money', amount: '22 000 CDF', color: '#6f0002' },
 ];
 
-const BEDS = [
-  { svc: 'Médecine interne', used: 18, total: 24, color: '#006400' },
-  { svc: 'Chirurgie', used: 11, total: 16, color: '#018000' },
-  { svc: 'Maternité', used: 9, total: 12, color: '#976644' },
-  { svc: 'Pédiatrie', used: 14, total: 20, color: '#738f12' },
-];
+const BED_COLORS = ['#006400', '#018000', '#976644', '#738f12', '#889682', '#683c1f'];
 
 const QUICK: { key: string; icon: Ico; color: string }[] = [
   { key: 'urgences', icon: IconUrgences, color: '#6f0002' },
@@ -171,6 +163,23 @@ export function Dashboard({
   userName?: string;
 }) {
   const { t } = useI18n();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [wards, setWards] = useState<WardOccupancy[]>([]);
+
+  useEffect(() => {
+    api.stats.dashboard().then(setStats).catch(() => {});
+    api.hospital.wards().then(setWards).catch(() => {});
+  }, []);
+
+  const revenueValue = stats
+    ? [
+        stats.revenueTodayUsd ? money(stats.revenueTodayUsd, 'USD') : null,
+        stats.revenueTodayCdf ? money(stats.revenueTodayCdf, 'CDF') : null,
+      ]
+        .filter(Boolean)
+        .join(' + ') || money(0, 'CDF')
+    : '—';
+
   return (
     <>
       <div className="page-head">
@@ -180,12 +189,33 @@ export function Dashboard({
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs (donnees reelles) */}
       <div className="grid grid--kpi" style={{ marginBottom: 14 }}>
-        <Kpi icon={IconPatients} color="#018000" label={t('dash.kpi.patients')} value="86" delta="12%" up />
-        <Kpi icon={IconAgenda} color="#976644" label={t('dash.kpi.appointments')} value="34" delta="5%" up />
-        <Kpi icon={IconBed} color="#738f12" label={t('dash.kpi.beds')} value="52 / 72" delta="3%" up />
-        <Kpi icon={IconFinance} color="#9a7b0a" label={t('dash.kpi.revenue')} value="1 240 $" delta="2%" up={false} />
+        <Kpi
+          icon={IconPatients}
+          color="#018000"
+          label={t('dash.kpi.patients')}
+          value={stats ? String(stats.patientsToday) : '—'}
+          sub={stats ? `${stats.patientsTotal}` : undefined}
+        />
+        <Kpi
+          icon={IconBed}
+          color="#976644"
+          label={t('dash.kpi.inpatients')}
+          value={stats ? String(stats.inpatients) : '—'}
+        />
+        <Kpi
+          icon={IconBed}
+          color="#738f12"
+          label={t('dash.kpi.beds')}
+          value={stats ? `${stats.bedsOccupied} / ${stats.bedsTotal}` : '—'}
+        />
+        <Kpi
+          icon={IconFinance}
+          color="#9a7b0a"
+          label={t('dash.kpi.revenue')}
+          value={revenueValue}
+        />
       </div>
 
       {/* Recettes + Rendez-vous */}
@@ -242,34 +272,42 @@ export function Dashboard({
         <div className="card">
           <div className="card__head">
             <h3>{t('dash.occupancy')}</h3>
-            <span className="badge badge--warning">{t('dash.occupancyGlobal', { n: 72 })}</span>
+            <span className="badge badge--warning">
+              {t('dash.occupancyGlobal', {
+                n: stats && stats.bedsTotal ? Math.round((stats.bedsOccupied / stats.bedsTotal) * 100) : 0,
+              })}
+            </span>
           </div>
           <div className="card__body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {BEDS.map((b) => (
-              <div key={b.svc}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: 6,
-                    fontSize: 13,
-                  }}
-                >
-                  <span style={{ color: 'var(--heading)', fontWeight: 600 }}>{b.svc}</span>
-                  <span style={{ color: 'var(--muted)' }}>
-                    {b.used}/{b.total}
-                  </span>
-                </div>
-                <div className="bar">
-                  <span
+            {wards.length === 0 ? (
+              <div className="empty" style={{ padding: 20 }}>{t('common.loading')}</div>
+            ) : (
+              wards.map((w, i) => (
+                <div key={w.id}>
+                  <div
                     style={{
-                      width: `${(b.used / b.total) * 100}%`,
-                      background: b.color,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: 6,
+                      fontSize: 13,
                     }}
-                  />
+                  >
+                    <span style={{ color: 'var(--heading)', fontWeight: 600 }}>{w.name}</span>
+                    <span style={{ color: 'var(--muted)' }}>
+                      {w.occupied}/{w.total}
+                    </span>
+                  </div>
+                  <div className="bar">
+                    <span
+                      style={{
+                        width: `${w.total ? (w.occupied / w.total) * 100 : 0}%`,
+                        background: BED_COLORS[i % BED_COLORS.length],
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 

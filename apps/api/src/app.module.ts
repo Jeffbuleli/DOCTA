@@ -7,6 +7,8 @@ import { UsersModule } from './users/users.module';
 import { CurrencyModule } from './currency/currency.module';
 import { PatientsModule } from './patients/patients.module';
 import { HospitalModule } from './hospital/hospital.module';
+import { BillingModule } from './billing/billing.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { HospitalModule } from './hospital/hospital.module';
     CurrencyModule,
     PatientsModule,
     HospitalModule,
+    BillingModule,
+    StatsModule,
   ],
   controllers: [HealthController],
 })

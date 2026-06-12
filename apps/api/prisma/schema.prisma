@@ -98,6 +98,7 @@ model Patient {
 
   tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   admissions Admission[]
+  invoices   Invoice[]
 
   @@unique([tenantId, mrn])
   @@index([tenantId, lastName])
@@ -178,4 +179,75 @@ model Admission {
 
   @@index([tenantId, status])
   @@index([patientId])
+}
+
+/// =====================  CAISSE / FACTURATION  =====================
+
+enum InvoiceStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  CANCELLED
+}
+
+enum PayMethod {
+  CASH
+  MPESA
+  ORANGE
+  AIRTEL
+  CARD
+  BANK
+  INSURANCE
+}
+
+/// Facture exprimee dans une devise de reference (CDF ou USD).
+model Invoice {
+  id        String        @id @default(cuid())
+  tenantId  String
+  number    String
+  patientId String?
+  currency  Currency      @default(CDF)
+  total     Decimal       @db.Decimal(14, 2)
+  paid      Decimal       @default(0) @db.Decimal(14, 2)
+  status    InvoiceStatus @default(UNPAID)
+  createdAt DateTime      @default(now())
+
+  patient  Patient?      @relation(fields: [patientId], references: [id])
+  items    InvoiceItem[]
+  payments Payment[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+}
+
+model InvoiceItem {
+  id        String  @id @default(cuid())
+  invoiceId String
+  label     String
+  quantity  Int     @default(1)
+  unitPrice Decimal @db.Decimal(14, 2)
+  amount    Decimal @db.Decimal(14, 2)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+/// Paiement : peut etre dans une devise differente de la facture (converti au taux).
+model Payment {
+  id            String    @id @default(cuid())
+  tenantId      String
+  invoiceId     String
+  method        PayMethod
+  currency      Currency
+  amount        Decimal   @db.Decimal(14, 2) // dans la devise du paiement
+  cdfPerUsd     Decimal   @db.Decimal(14, 4) // taux utilise
+  amountInvoice Decimal   @db.Decimal(14, 2) // converti dans la devise de la facture
+  reference     String?
+  createdAt     DateTime  @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([invoiceId])
 }

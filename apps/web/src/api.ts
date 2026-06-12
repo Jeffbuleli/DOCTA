@@ -110,6 +110,61 @@ export interface Admission {
   bed: { id: string; label: string; room: { name: string } };
 }
 
+export interface DashboardStats {
+  patientsTotal: number;
+  patientsToday: number;
+  bedsTotal: number;
+  bedsOccupied: number;
+  inpatients: number;
+  revenueTodayCdf: number;
+  revenueTodayUsd: number;
+}
+
+export type Currency = 'CDF' | 'USD';
+export type InvoiceStatus = 'UNPAID' | 'PARTIAL' | 'PAID' | 'CANCELLED';
+export type PayMethod =
+  | 'CASH'
+  | 'MPESA'
+  | 'ORANGE'
+  | 'AIRTEL'
+  | 'CARD'
+  | 'BANK'
+  | 'INSURANCE';
+
+export interface InvoiceItem {
+  id: string;
+  label: string;
+  quantity: number;
+  unitPrice: string;
+  amount: string;
+}
+export interface PaymentRec {
+  id: string;
+  method: PayMethod;
+  currency: Currency;
+  amount: string;
+  amountInvoice: string;
+  reference: string | null;
+  createdAt: string;
+}
+export interface Invoice {
+  id: string;
+  number: string;
+  currency: Currency;
+  total: string;
+  paid: string;
+  status: InvoiceStatus;
+  createdAt: string;
+  patient: Patient | null;
+  items?: InvoiceItem[];
+  payments?: PaymentRec[];
+}
+export interface NewInvoiceItem {
+  label: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 /* ---- Endpoints ---- */
 export const api = {
   login: (tenantSlug: string, email: string, password: string) =>
@@ -171,6 +226,43 @@ export const api = {
     discharge: (admissionId: string) =>
       request<unknown>(`/hospital/admissions/${admissionId}/discharge`, {
         method: 'PATCH',
+      }),
+  },
+
+  stats: {
+    dashboard: () => request<DashboardStats>('/stats/dashboard'),
+  },
+
+  invoices: {
+    list: (status?: InvoiceStatus, search?: string) => {
+      const p = new URLSearchParams();
+      if (status) p.set('status', status);
+      if (search) p.set('search', search);
+      const qs = p.toString();
+      return request<Invoice[]>(`/invoices${qs ? `?${qs}` : ''}`);
+    },
+    get: (id: string) => request<Invoice>(`/invoices/${id}`),
+    create: (data: {
+      patientId?: string;
+      currency: Currency;
+      items: NewInvoiceItem[];
+    }) =>
+      request<Invoice>('/invoices', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    pay: (
+      id: string,
+      data: {
+        method: PayMethod;
+        currency: Currency;
+        amount: number;
+        reference?: string;
+      },
+    ) =>
+      request<Invoice>(`/invoices/${id}/payments`, {
+        method: 'POST',
+        body: JSON.stringify(data),
       }),
   },
 };

@@ -3,6 +3,7 @@ import { AppShell } from './AppShell';
 import { Dashboard } from './pages/Dashboard';
 import { Patients } from './pages/Patients';
 import { Hospitalisation } from './pages/Hospitalisation';
+import { Caisse } from './pages/Caisse';
 import { Placeholder } from './pages/Placeholder';
 import { Login } from './pages/Login';
 import { useAuth } from './auth';
@@ -14,7 +15,6 @@ import {
   IconAgenda,
   IconPharmacie,
   IconLabo,
-  IconCaisse,
   IconPersonnel,
   IconSettings,
 } from './icons';
@@ -22,13 +22,12 @@ import {
 const FALLBACK_RATE = 2800;
 
 const PH_ICONS: Record<
-  Exclude<PageKey, 'dashboard' | 'patients' | 'hospit'>,
+  Exclude<PageKey, 'dashboard' | 'patients' | 'hospit' | 'caisse'>,
   typeof IconPatients
 > = {
   agenda: IconAgenda,
   pharmacie: IconPharmacie,
   labo: IconLabo,
-  caisse: IconCaisse,
   personnel: IconPersonnel,
   reglages: IconSettings,
 };
@@ -78,6 +77,8 @@ export function App() {
         <Patients />
       ) : page === 'hospit' ? (
         <Hospitalisation />
+      ) : page === 'caisse' ? (
+        <Caisse />
       ) : (
         <Placeholder
           title={t(`page.${page}`)}
