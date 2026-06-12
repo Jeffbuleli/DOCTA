@@ -578,6 +578,32 @@ button {
   background: var(--success);
 }
 
+/* Footer "Powered by McBuleli" */
+.powered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 18px 0 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.powered__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--heading);
+  font-weight: 700;
+  text-decoration: none;
+}
+.powered__link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.powered__link svg {
+  flex: none;
+}
+
 /* ===========================================================================
    MODULE PATIENTS (liste, recherche, modale)
    =========================================================================== */

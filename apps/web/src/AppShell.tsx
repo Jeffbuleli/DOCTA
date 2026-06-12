@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { NAV, BOTTOM_NAV, type PageKey } from './nav';
 import { useTheme } from './theme';
+import { Footer } from './components/Footer';
 import {
   IconMenu,
   IconSearch,
@@ -167,7 +168,10 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="shell__main">{children}</main>
+        <main className="shell__main">
+          {children}
+          <Footer />
+        </main>
       </div>
 
       {/* Bottom nav mobile */}

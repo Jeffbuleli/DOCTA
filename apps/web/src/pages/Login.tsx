@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useAuth } from '../auth';
 import { ApiError } from '../api';
+import { Footer } from '../components/Footer';
 
 const BrandMark = () => (
   <svg width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden>
@@ -109,6 +110,7 @@ export function Login() {
           Démo : clinique-demo · admin@docta.cd · docta1234
         </div>
       </form>
+      <Footer />
     </div>
   );
 }

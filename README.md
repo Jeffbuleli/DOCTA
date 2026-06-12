@@ -4,6 +4,8 @@
 Conçu d'abord pour les réalités de la **RD Congo** : multi-services, multi-devises (CDF/USD), mobile money, fonctionnement hors-ligne, et une interface **visuelle et iconographique** compréhensible même par un personnel peu à l'aise avec la technologie.
 
 > Statut : 🌱 Cadrage — ce document est la référence produit.
+>
+> 👉 **La vision complète** (plateforme nationale, dossier porté par le patient, recommandation d'hôpital, téléconsultation, IA, dons) est dans **[VISION.md](VISION.md)**.
 
 ---
 
