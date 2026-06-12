@@ -4,6 +4,29 @@
 
 ---
 
+## 0. Identité unique — ALL-IN-ONE (Patient · Personnel · LinkedIn · Freelance)
+
+**Une personne = un seul compte.** Jamais de comptes séparés (l'erreur d'Upwork : séparer Freelance/Client → doubles profils, mots de passe en double, gestion impossible). Sur Docta, on **bascule de rôle** à tout moment.
+
+Une même personne est, au fil du temps et des lieux :
+- **Patient** partout où elle reçoit des soins (ex. un soignant de Lubumbashi en mission à Shabunda y devient patient) ;
+- **Personnel** d'un ou **plusieurs** hôpitaux qui l'ont engagée (ex. médecin traitant à l'Hôpital du Cinquantenaire **et** gynécologue consultant dans un centre privé) ;
+- **Gestionnaire/propriétaire** d'un hôpital qu'elle crée et où elle recrute.
+
+**Concepts clés**
+- **Compte** : identité globale (e-mail + mot de passe), un profil unique.
+- **Appartenance (Membership / emploi)** : relie une personne ↔ un hôpital, avec **rôle** (médecin, infirmier, admin…), **titre**, **statut** (en attente / actif / terminé) et **période** (date début → date fin). Multi-hôpitaux possible.
+- **Bascule de rôle** : après connexion unique, la personne choisit son contexte — « Patient » (portail public) ou l'un de **ses hôpitaux** (le SIH de cet hôpital). Elle bascule quand elle veut.
+- **Profil public (type LinkedIn)** : le **parcours** = liste des appartenances avec leurs périodes — « Hôpital Maman Mobutu, Médecin traitant, 2025–2026 ». Un **licenciement** = appartenance **terminée** (date de fin) → apparaît comme **expérience passée** sur le profil public.
+- **Créer un hôpital & recruter** : une personne crée un établissement → en devient **admin/propriétaire**, remplit son profil (services, capacités) et **recrute** du personnel (par e-mail). Voir les profils, le parcours, savoir dans quels hôpitaux travaille un soignant.
+- **Médecin multi-hôpitaux + RDV** : un médecin **consulté en privé** par un utilisateur peut lui proposer un **rendez-vous dans l'un des hôpitaux où il exerce**, selon le type de problème.
+
+**Esprit** : une plateforme **ouverte à tous**, qui mêle **Freelance + LinkedIn + communauté santé** — une seule app pour le patient, le soignant et l'hôpital.
+
+**Impact technique** : l'ancien modèle « compte du personnel par hôpital » (`User`) fusionne dans **`Account` + `Membership`**. Connexion **unique** (e-mail + mot de passe), sans choisir l'hôpital au login ; on bascule ensuite. Les écrans personnel continuent de fonctionner : un garde lit le compte + l'hôpital actif (en-tête `X-Tenant`) et retrouve le rôle via l'appartenance.
+
+---
+
 ## 1. Le problème (pourquoi Docta existe)
 
 En RDC, **accéder au bon soin au bon moment est un problème vital** :
