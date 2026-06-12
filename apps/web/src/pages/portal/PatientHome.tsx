@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '../../i18n';
 import { useAccount } from '../../account';
 import { api } from '../../api';
+import { navigate } from '../../router';
 import { Footer } from '../../components/Footer';
 import {
   IconHospit,
@@ -82,12 +83,19 @@ export function PatientHome() {
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 14 }}>
           {TILES.map((tile) => {
             const Icon = tile.icon;
+            const active = tile.key === 'findHospital';
             return (
-              <div key={tile.key} className="tile" style={{ ['--tile' as string]: tile.color, opacity: 0.92 }}>
+              <button
+                key={tile.key}
+                className="tile"
+                style={{ ['--tile' as string]: tile.color }}
+                onClick={() => active && navigate('/hopitaux')}
+                disabled={!active}
+              >
                 <span className="tile-icon"><Icon width={28} height={28} /></span>
                 <span className="tile-label">{t(`phome.${tile.key}`)}</span>
-                <span className="badge badge--muted" style={{ fontSize: 11 }}>{t('phome.soon')}</span>
-              </div>
+                {!active && <span className="badge badge--muted" style={{ fontSize: 11 }}>{t('phome.soon')}</span>}
+              </button>
             );
           })}
         </div>

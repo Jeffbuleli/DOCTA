@@ -13,14 +13,20 @@ datasource db {
 
 /// Etablissement = locataire (tenant). Chaque donnee est rattachee a un tenant.
 model Tenant {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  city      String?
-  country   String   @default("CD") // RD Congo par defaut
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  city         String?
+  country      String   @default("CD") // RD Congo par defaut
+  active       Boolean  @default(true)
+  // Annuaire public + recommandation
+  publicListed Boolean  @default(true)
+  address      String?
+  phone        String?
+  latitude     Float?
+  longitude    Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   users         User[]
   patients      Patient[]

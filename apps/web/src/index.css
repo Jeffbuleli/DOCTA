@@ -1014,6 +1014,44 @@ button {
   text-decoration: underline;
 }
 
+/* Annuaire hopitaux */
+.hosp {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.hosp:last-child {
+  border-bottom: none;
+}
+.hosp__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hosp__name {
+  font-weight: 700;
+  color: var(--heading);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.hosp__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
 /* ===========================================================================
    DESKTOP (>= 1024px)
    =========================================================================== */

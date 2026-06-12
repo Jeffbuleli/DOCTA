@@ -187,6 +187,20 @@ export interface AccountAuthResponse {
   devLink?: string;
 }
 
+export interface HospitalListing {
+  slug: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  bedsTotal: number;
+  bedsAvailable: number;
+  services: string[];
+  distanceKm: number | null;
+}
+
 /* ---- Endpoints ---- */
 export const api = {
   login: (tenantSlug: string, email: string, password: string) =>
@@ -330,5 +344,18 @@ export const api = {
         '/account/resend-verification',
         { method: 'POST', tokenKind: 'account' },
       ),
+  },
+
+  public: {
+    hospitals: (params?: { lat?: number; lng?: number; q?: string }) => {
+      const p = new URLSearchParams();
+      if (params?.lat != null) p.set('lat', String(params.lat));
+      if (params?.lng != null) p.set('lng', String(params.lng));
+      if (params?.q) p.set('q', params.q);
+      const qs = p.toString();
+      return request<HospitalListing[]>(`/public/hospitals${qs ? `?${qs}` : ''}`, {
+        auth: false,
+      });
+    },
   },
 };

@@ -51,6 +51,10 @@ export function Landing() {
             <span className="door__desc">{t('portal.iamStaffDesc')}</span>
           </span>
         </button>
+
+        <button className="linklike" style={{ marginTop: 10 }} onClick={() => navigate('/hopitaux')}>
+          {t('dir.title')}
+        </button>
       </div>
       <Footer />
     </div>

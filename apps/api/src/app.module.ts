@@ -11,6 +11,7 @@ import { BillingModule } from './billing/billing.module';
 import { StatsModule } from './stats/stats.module';
 import { MailModule } from './mail/mail.module';
 import { AccountModule } from './account/account.module';
+import { PublicModule } from './public/public.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AccountModule } from './account/account.module';
     BillingModule,
     StatsModule,
     AccountModule,
+    PublicModule,
   ],
   controllers: [HealthController],
 })

@@ -4,6 +4,7 @@ import { PatientPortal } from './PatientPortal';
 import { Landing } from './pages/portal/Landing';
 import { VerifyEmail } from './pages/portal/VerifyEmail';
 import { ResetPassword } from './pages/portal/ResetPassword';
+import { HospitalDirectory } from './pages/portal/HospitalDirectory';
 import { usePath } from './router';
 
 /** Aiguillage racine entre face publique (patient) et face hopital (personnel). */
@@ -19,6 +20,7 @@ export function Root() {
   }
   if (path === '/verifier-email') return <VerifyEmail />;
   if (path === '/reinitialiser') return <ResetPassword />;
+  if (path.startsWith('/hopitaux')) return <HospitalDirectory />;
   if (path.startsWith('/patient')) return <PatientPortal />;
   return <Landing />;
 }
