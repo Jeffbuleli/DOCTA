@@ -5,19 +5,24 @@ import { api } from '../../api';
 import { navigate } from '../../router';
 import { Footer } from '../../components/Footer';
 import {
-  IconHospit,
+  IconHospitalBuilding,
   IconAgenda,
-  IconPatients,
-  IconConsultation,
+  IconMedicalRecord,
+  IconVideo,
   IconLogout,
 } from '../../icons';
 
 const TILES = [
-  { key: 'findHospital', icon: IconHospit, color: '#018000' },
+  { key: 'findHospital', icon: IconHospitalBuilding, color: '#018000' },
+  { key: 'myRecord', icon: IconMedicalRecord, color: '#738f12' },
   { key: 'appointments', icon: IconAgenda, color: '#976644' },
-  { key: 'myRecord', icon: IconPatients, color: '#738f12' },
-  { key: 'teleconsult', icon: IconConsultation, color: '#0891b2' },
+  { key: 'teleconsult', icon: IconVideo, color: '#0891b2' },
 ] as const;
+
+const ROUTES: Record<string, string | undefined> = {
+  findHospital: '/hopitaux',
+  myRecord: '/patient/dossier',
+};
 
 export function PatientHome() {
   const { t, lang, setLang } = useI18n();
@@ -83,18 +88,18 @@ export function PatientHome() {
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 14 }}>
           {TILES.map((tile) => {
             const Icon = tile.icon;
-            const active = tile.key === 'findHospital';
+            const route = ROUTES[tile.key];
             return (
               <button
                 key={tile.key}
                 className="tile"
                 style={{ ['--tile' as string]: tile.color }}
-                onClick={() => active && navigate('/hopitaux')}
-                disabled={!active}
+                onClick={() => route && navigate(route)}
+                disabled={!route}
               >
                 <span className="tile-icon"><Icon width={28} height={28} /></span>
                 <span className="tile-label">{t(`phome.${tile.key}`)}</span>
-                {!active && <span className="badge badge--muted" style={{ fontSize: 11 }}>{t('phome.soon')}</span>}
+                {!route && <span className="badge badge--muted" style={{ fontSize: 11 }}>{t('phome.soon')}</span>}
               </button>
             );
           })}

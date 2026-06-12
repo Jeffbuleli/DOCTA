@@ -82,6 +82,9 @@ model Account {
   emailVerified Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  links       AccountPatientLink[]
+  shareGrants ShareGrant[]
 }
 
 /// Taux du jour : combien de CDF pour 1 USD (ex: 2800).
@@ -116,9 +119,10 @@ model Patient {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  admissions Admission[]
-  invoices   Invoice[]
+  tenant       Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  admissions   Admission[]
+  invoices     Invoice[]
+  accountLinks AccountPatientLink[]
 
   @@unique([tenantId, mrn])
   @@index([tenantId, lastName])
@@ -270,4 +274,61 @@ model Payment {
 
   @@index([tenantId, createdAt])
   @@index([invoiceId])
+}
+
+/// =====================  DOSSIER PORTABLE / CONSENTEMENT  =====================
+
+/// Rattachement d'un dossier hospitalier (Patient) au compte global du patient.
+model AccountPatientLink {
+  id        String   @id @default(cuid())
+  accountId String
+  patientId String
+  createdAt DateTime @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, patientId])
+  @@index([accountId])
+  @@index([patientId])
+}
+
+/// Code genere par un hopital pour permettre au patient de revendiquer son dossier.
+model LinkCode {
+  id        String    @id @default(cuid())
+  tenantId  String
+  patientId String
+  code      String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([code])
+}
+
+/// Autorisation de partage : le patient partage son dossier avec qui presente le code.
+model ShareGrant {
+  id        String   @id @default(cuid())
+  accountId String
+  code      String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  account  Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accesses ShareAccess[]
+
+  @@index([code])
+}
+
+/// Journal d'acces (audit) : qui a consulte un dossier partage, et quand.
+model ShareAccess {
+  id         String   @id @default(cuid())
+  grantId    String
+  tenantId   String
+  userId     String
+  accessedAt DateTime @default(now())
+
+  grant ShareGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
+
+  @@index([grantId])
 }

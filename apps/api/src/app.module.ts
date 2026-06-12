@@ -12,6 +12,7 @@ import { StatsModule } from './stats/stats.module';
 import { MailModule } from './mail/mail.module';
 import { AccountModule } from './account/account.module';
 import { PublicModule } from './public/public.module';
+import { RecordsModule } from './records/records.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PublicModule } from './public/public.module';
     StatsModule,
     AccountModule,
     PublicModule,
+    RecordsModule,
   ],
   controllers: [HealthController],
 })

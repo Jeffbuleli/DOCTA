@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useI18n } from '../../i18n';
 import { api, type HospitalListing } from '../../api';
 import { Footer } from '../../components/Footer';
-import { IconSearch, IconHospit, IconLogout } from '../../icons';
+import { IconSearch, IconHospitalBuilding, IconLogout } from '../../icons';
 
 export function HospitalDirectory() {
   const { t, lang, setLang } = useI18n();
@@ -86,7 +86,7 @@ export function HospitalDirectory() {
             <div className="empty">{t('common.loading')}</div>
           ) : list.length === 0 ? (
             <div className="empty">
-              <span className="ic"><IconHospit width={30} height={30} /></span>
+              <span className="ic"><IconHospitalBuilding width={30} height={30} /></span>
               <p style={{ margin: 0 }}>{t('dir.none')}</p>
             </div>
           ) : (
@@ -94,7 +94,7 @@ export function HospitalDirectory() {
               <div className="hosp" key={h.slug}>
                 <div className="hosp__top">
                   <span className="ic-round" style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>
-                    <IconHospit width={20} height={20} />
+                    <IconHospitalBuilding width={20} height={20} />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="hosp__name">

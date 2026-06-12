@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { api, ApiError, type Patient, type Sex } from '../api';
-import { IconSearch, IconPlus, IconPatients } from '../icons';
+import { api, ApiError, type Patient, type RecordSummary, type Sex } from '../api';
+import { IconSearch, IconPlus, IconPatients, IconShare, IconLink, IconHospitalBuilding } from '../icons';
 import { AdmitModal } from '../components/AdmitModal';
 import { useI18n } from '../i18n';
 
@@ -25,6 +25,7 @@ export function Patients() {
   const [list, setList] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showShared, setShowShared] = useState(false);
   const [detail, setDetail] = useState<Patient | null>(null);
 
   const load = (q: string) => {
@@ -61,6 +62,10 @@ export function Patients() {
             autoCapitalize="none"
           />
         </div>
+        <button className="btn" onClick={() => setShowShared(true)} title={t('staff.sharedRecord')}>
+          <IconShare width={18} height={18} />
+          <span className="hide-xs">{t('staff.sharedRecord')}</span>
+        </button>
         <button className="btn btn--primary" onClick={() => setShowForm(true)}>
           <IconPlus width={18} height={18} />
           <span className="hide-xs">{t('common.new')}</span>
@@ -115,6 +120,7 @@ export function Patients() {
       )}
 
       {detail && <PatientDetail patient={detail} onClose={() => setDetail(null)} />}
+      {showShared && <SharedRecordModal onClose={() => setShowShared(false)} />}
     </>
   );
 }
@@ -213,6 +219,16 @@ function PatientDetail({ patient: p, onClose }: { patient: Patient; onClose: () 
   const { t } = useI18n();
   const [admit, setAdmit] = useState(false);
   const [done, setDone] = useState(false);
+  const [linkCode, setLinkCode] = useState<string | null>(null);
+
+  const generateLink = async () => {
+    try {
+      const r = await api.records.linkCode(p.id);
+      setLinkCode(r.code);
+    } catch {
+      /* ignore */
+    }
+  };
   const Row = ({ k, v }: { k: string; v: string }) => (
     <div className="list__row">
       <span className="list__main">
@@ -259,6 +275,17 @@ function PatientDetail({ patient: p, onClose }: { patient: Patient; onClose: () 
               {t('patients.admit')}
             </button>
           )}
+
+          {linkCode ? (
+            <div style={{ marginTop: 12, textAlign: 'center' }}>
+              <div style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 6 }}>{t('staff.linkCodeShown')}</div>
+              <div className="sharecode" style={{ fontSize: 30 }}>{linkCode}</div>
+            </div>
+          ) : (
+            <button className="btn" style={{ width: '100%', marginTop: 10 }} onClick={generateLink}>
+              <IconLink width={18} height={18} /> {t('staff.linkAccount')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -272,6 +299,98 @@ function PatientDetail({ patient: p, onClose }: { patient: Patient; onClose: () 
           }}
         />
       )}
+    </div>
+  );
+}
+
+/* ---- Consulter un dossier partage (code du patient) ---- */
+function SharedRecordModal({ onClose }: { onClose: () => void }) {
+  const { t, lang } = useI18n();
+  const [code, setCode] = useState('');
+  const [data, setData] = useState<RecordSummary | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const admBadge: Record<string, string> = { ACTIVE: 'info', DISCHARGED: 'success', TRANSFERRED: 'warning' };
+  const fmt = (iso: string) => new Date(iso).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB');
+
+  const redeem = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    try {
+      setData(await api.records.redeem(code.trim()));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('rec.linkError'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal__head">
+          <h3>{t('staff.sharedRecord')}</h3>
+          <button type="button" className="iconbtn" onClick={onClose} aria-label="Fermer">✕</button>
+        </div>
+        <div className="modal__body">
+          {!data ? (
+            <form onSubmit={redeem}>
+              {error && <div className="auth__error">{error}</div>}
+              <div className="field">
+                <label>{t('staff.enterShare')}</label>
+                <input
+                  className="input"
+                  style={{ textTransform: 'uppercase', letterSpacing: '0.15em', textAlign: 'center', fontWeight: 700 }}
+                  value={code}
+                  onChange={(ev) => setCode(ev.target.value.toUpperCase())}
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  required
+                />
+              </div>
+              <button className="btn-primary" type="submit" disabled={busy}>
+                {busy ? <span className="spinner" /> : t('staff.view')}
+              </button>
+            </form>
+          ) : (
+            <>
+              <div style={{ fontWeight: 700, color: 'var(--heading)', marginBottom: 12 }}>
+                {t('staff.sharedFrom', { name: data.account?.fullName ?? '' })}
+              </div>
+              {data.records.map((r, i) => (
+                <div key={i} className="card" style={{ marginBottom: 12, padding: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    <span className="ic-round" style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>
+                      <IconHospitalBuilding width={18} height={18} />
+                    </span>
+                    <div>
+                      <div style={{ fontWeight: 700, color: 'var(--heading)' }}>{r.hospital}</div>
+                      <div className="pt-meta">{r.city ? `${r.city} · ` : ''}<span className="mrn">{r.mrn}</span></div>
+                    </div>
+                  </div>
+                  {r.admissions.length === 0 ? (
+                    <div style={{ color: 'var(--muted)', fontSize: 13 }}>{t('rec.noAdmissions')}</div>
+                  ) : (
+                    <div className="list">
+                      {r.admissions.map((a, j) => (
+                        <div className="list__row" key={j}>
+                          <span className="list__main">
+                            <span className="list__title">{a.ward} · {a.bed}</span>
+                            <span className="list__sub">{fmt(a.admittedAt)}{a.dischargedAt ? ` → ${fmt(a.dischargedAt)}` : ''}{a.reason ? ` · ${a.reason}` : ''}</span>
+                          </span>
+                          <span className={`badge badge--${admBadge[a.status] ?? 'muted'}`}>{t(`adm.${a.status}`)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

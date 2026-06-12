@@ -216,3 +216,58 @@ export const IconLogout = (p: IconProps) => (
     <path d="M28 24H42M36 18l6 6-6 6" />
   </svg>
 );
+
+// Hopital — batiment avec croix (pour la face PATIENT : trouver un hopital)
+export const IconHospitalBuilding = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M9 42V16l15-7 15 7v26" />
+    <path d="M6 42h36" />
+    <path d="M24 16v6M21 19h6" />
+    <path d="M16 30h4M28 30h4M16 36h4M28 36h4" />
+    <path d="M21 42v-6h6v6" />
+  </svg>
+);
+
+// Dossier medical — fiche + trace ECG
+export const IconMedicalRecord = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="11" y="7" width="26" height="35" rx="3" />
+    <path d="M18 7v4h12V7" />
+    <path d="M15 27h3l2-5 3 10 2-5h5" />
+  </svg>
+);
+
+// Teleconsultation — camera video
+export const IconVideo = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="7" y="15" width="25" height="18" rx="3" />
+    <path d="M32 21l9-5v16l-9-5z" />
+  </svg>
+);
+
+// Partage / consentement — noeuds relies
+export const IconShare = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="13" cy="24" r="4" />
+    <circle cx="35" cy="13" r="4" />
+    <circle cx="35" cy="35" r="4" />
+    <path d="M17 22l14-7M17 26l14 7" />
+  </svg>
+);
+
+// Lien / rattachement de dossier
+export const IconLink = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M20 28l8-8" />
+    <path d="M18 23l-4 4a6 6 0 0 0 8 8l4-4" />
+    <path d="M30 25l4-4a6 6 0 0 0-8-8l-4 4" />
+  </svg>
+);
+
+// Bouclier — securite / consentement
+export const IconShield = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M24 6 10 12v8c0 9 6 14 14 18 8-4 14-9 14-18v-8L24 6Z" />
+    <path d="M18 24l4 4 8-9" />
+  </svg>
+);

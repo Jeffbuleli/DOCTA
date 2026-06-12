@@ -1052,6 +1052,21 @@ button {
   padding: 3px 10px;
 }
 
+/* Code de partage / liaison — gros, lisible */
+.sharecode {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 18px 10px;
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
+  user-select: all;
+}
+
 /* ===========================================================================
    DESKTOP (>= 1024px)
    =========================================================================== */

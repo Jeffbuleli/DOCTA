@@ -187,6 +187,36 @@ export interface AccountAuthResponse {
   devLink?: string;
 }
 
+export interface AdmissionSummary {
+  ward: string;
+  bed: string;
+  reason: string | null;
+  status: string;
+  admittedAt: string;
+  dischargedAt: string | null;
+}
+export interface RecordEntry {
+  hospital: string;
+  city: string | null;
+  mrn: string;
+  patient: {
+    firstName: string;
+    lastName: string;
+    sex: Sex | null;
+    birthDate: string | null;
+    phone: string | null;
+  };
+  admissions: AdmissionSummary[];
+}
+export interface RecordSummary {
+  account: { fullName: string; email: string } | null;
+  records: RecordEntry[];
+}
+export interface ShareCode {
+  code: string;
+  expiresAt: string;
+}
+
 export interface HospitalListing {
   slug: string;
   name: string;
@@ -344,6 +374,33 @@ export const api = {
         '/account/resend-verification',
         { method: 'POST', tokenKind: 'account' },
       ),
+  },
+
+  records: {
+    // cote patient (compte)
+    list: () => request<RecordSummary>('/account/records', { tokenKind: 'account' }),
+    link: (code: string) =>
+      request<{ linked: boolean }>('/account/records/link', {
+        method: 'POST',
+        tokenKind: 'account',
+        body: JSON.stringify({ code }),
+      }),
+    share: () =>
+      request<ShareCode>('/account/records/share', {
+        method: 'POST',
+        tokenKind: 'account',
+      }),
+    // cote personnel
+    linkCode: (patientId: string) =>
+      request<ShareCode>('/records/link-code', {
+        method: 'POST',
+        body: JSON.stringify({ patientId }),
+      }),
+    redeem: (code: string) =>
+      request<RecordSummary>('/records/redeem', {
+        method: 'POST',
+        body: JSON.stringify({ code }),
+      }),
   },
 
   public: {
