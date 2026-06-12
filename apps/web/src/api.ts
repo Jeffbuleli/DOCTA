@@ -3,11 +3,18 @@
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '';
 
 const TOKEN_KEY = 'docta-token';
+const ACCOUNT_TOKEN_KEY = 'docta-account-token';
 
 export const tokenStore = {
   get: () => localStorage.getItem(TOKEN_KEY),
   set: (t: string) => localStorage.setItem(TOKEN_KEY, t),
   clear: () => localStorage.removeItem(TOKEN_KEY),
+};
+
+export const accountTokenStore = {
+  get: () => localStorage.getItem(ACCOUNT_TOKEN_KEY),
+  set: (t: string) => localStorage.setItem(ACCOUNT_TOKEN_KEY, t),
+  clear: () => localStorage.removeItem(ACCOUNT_TOKEN_KEY),
 };
 
 export class ApiError extends Error {
@@ -20,13 +27,14 @@ export class ApiError extends Error {
 
 async function request<T>(
   path: string,
-  options: RequestInit & { auth?: boolean } = {},
+  options: RequestInit & { auth?: boolean; tokenKind?: 'staff' | 'account' } = {},
 ): Promise<T> {
-  const { auth = true, headers, ...rest } = options;
+  const { auth = true, tokenKind = 'staff', headers, ...rest } = options;
   const h = new Headers(headers);
   h.set('Content-Type', 'application/json');
   if (auth) {
-    const t = tokenStore.get();
+    const store = tokenKind === 'account' ? accountTokenStore : tokenStore;
+    const t = store.get();
     if (t) h.set('Authorization', `Bearer ${t}`);
   }
 
@@ -165,6 +173,20 @@ export interface NewInvoiceItem {
   unitPrice: number;
 }
 
+export interface PublicAccount {
+  id: string;
+  email: string;
+  fullName: string;
+  phone: string | null;
+  emailVerified: boolean;
+  createdAt: string;
+}
+export interface AccountAuthResponse {
+  accessToken: string;
+  account: PublicAccount;
+  devLink?: string;
+}
+
 /* ---- Endpoints ---- */
 export const api = {
   login: (tenantSlug: string, email: string, password: string) =>
@@ -264,5 +286,49 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+  },
+
+  account: {
+    register: (data: {
+      fullName: string;
+      email: string;
+      password: string;
+      phone?: string;
+    }) =>
+      request<AccountAuthResponse>('/account/register', {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify(data),
+      }),
+    login: (email: string, password: string) =>
+      request<AccountAuthResponse>('/account/login', {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify({ email, password }),
+      }),
+    me: () => request<PublicAccount>('/account/me', { tokenKind: 'account' }),
+    verifyEmail: (token: string) =>
+      request<{ verified: boolean }>('/account/verify-email', {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify({ token }),
+      }),
+    requestReset: (email: string) =>
+      request<{ sent: boolean }>('/account/request-reset', {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify({ email }),
+      }),
+    resetPassword: (token: string, password: string) =>
+      request<{ reset: boolean }>('/account/reset-password', {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify({ token, password }),
+      }),
+    resendVerification: () =>
+      request<{ sent: boolean; alreadyVerified?: boolean }>(
+        '/account/resend-verification',
+        { method: 'POST', tokenKind: 'account' },
+      ),
   },
 };

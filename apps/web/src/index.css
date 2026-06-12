@@ -951,6 +951,69 @@ button {
   color: var(--muted);
 }
 
+/* Landing — portes patient / personnel */
+.door {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 18px;
+  margin-bottom: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+.door:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+.door--primary {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.door__ic {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, white);
+}
+.door__txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.door__title {
+  font-weight: 800;
+  color: var(--heading);
+  font-size: 16px;
+}
+.door__desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.linklike {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.linklike:hover {
+  text-decoration: underline;
+}
+
 /* ===========================================================================
    DESKTOP (>= 1024px)
    =========================================================================== */
