@@ -13,6 +13,7 @@ import {
   IconBloc,
 } from '../icons';
 import type { ComponentType, SVGProps } from 'react';
+import { useI18n } from '../i18n';
 
 type Ico = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -57,6 +58,7 @@ function Donut({
 }: {
   data: { label: string; value: number; color: string }[];
 }) {
+  const { t } = useI18n();
   const total = data.reduce((s, d) => s + d.value, 0);
   const R = 52;
   const C = 2 * Math.PI * R;
@@ -91,7 +93,7 @@ function Donut({
           fontSize="13"
           fill="var(--muted)"
         >
-          Total
+          {t('dash.total')}
         </text>
         <text
           x="70"
@@ -130,10 +132,10 @@ function Donut({
 }
 
 const APPTS = [
-  { name: 'Joseph Kabongo', svc: 'Consultation · Dr. Mukendi', time: '09:30', st: 'success', stl: 'Confirmé' },
-  { name: 'Marie Ilunga', svc: 'Maternité · CPN', time: '10:15', st: 'info', stl: 'En cours' },
-  { name: 'David Tshibangu', svc: 'Laboratoire · Bilan', time: '11:00', st: 'warning', stl: 'En attente' },
-  { name: 'Grace Mwamba', svc: 'Pédiatrie · Vaccin', time: '11:45', st: 'success', stl: 'Confirmé' },
+  { name: 'Joseph Kabongo', svc: 'Consultation · Dr. Mukendi', time: '09:30', st: 'success', stKey: 'confirmed' },
+  { name: 'Marie Ilunga', svc: 'Maternité · CPN', time: '10:15', st: 'info', stKey: 'inprogress' },
+  { name: 'David Tshibangu', svc: 'Laboratoire · Bilan', time: '11:00', st: 'warning', stKey: 'waiting' },
+  { name: 'Grace Mwamba', svc: 'Pédiatrie · Vaccin', time: '11:45', st: 'success', stKey: 'confirmed' },
 ];
 
 const TX = [
@@ -150,41 +152,48 @@ const BEDS = [
   { svc: 'Pédiatrie', used: 14, total: 20, color: '#738f12' },
 ];
 
-const QUICK: { label: string; icon: Ico; color: string }[] = [
-  { label: 'Urgences', icon: IconUrgences, color: '#6f0002' },
-  { label: 'Consultation', icon: IconConsultation, color: '#018000' },
-  { label: 'Maternité', icon: IconMaternite, color: '#bc8d65' },
-  { label: 'Bloc', icon: IconBloc, color: '#683c1f' },
-  { label: 'Pharmacie', icon: IconPharmacie, color: '#006400' },
-  { label: 'Laboratoire', icon: IconLabo, color: '#738f12' },
-  { label: 'Imagerie', icon: IconImagerie, color: '#889682' },
-  { label: 'Caisse', icon: IconCaisse, color: '#9a7b0a' },
+const QUICK: { key: string; icon: Ico; color: string }[] = [
+  { key: 'urgences', icon: IconUrgences, color: '#6f0002' },
+  { key: 'consultation', icon: IconConsultation, color: '#018000' },
+  { key: 'maternite', icon: IconMaternite, color: '#bc8d65' },
+  { key: 'bloc', icon: IconBloc, color: '#683c1f' },
+  { key: 'pharmacie', icon: IconPharmacie, color: '#006400' },
+  { key: 'labo', icon: IconLabo, color: '#738f12' },
+  { key: 'imagerie', icon: IconImagerie, color: '#889682' },
+  { key: 'caisse', icon: IconCaisse, color: '#9a7b0a' },
 ];
 
-export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
+export function Dashboard({
+  cdfPerUsd,
+  userName,
+}: {
+  cdfPerUsd: number;
+  userName?: string;
+}) {
+  const { t } = useI18n();
   return (
     <>
       <div className="page-head">
         <div>
-          <h1>Bonjour, Dr. Administrateur</h1>
-          <div className="sub">Clinique Démo · Kinshasa — voici l'activité du jour.</div>
+          <h1>{t('dash.greeting', { name: userName ?? 'Dr.' })}</h1>
+          <div className="sub">{t('dash.subtitle')}</div>
         </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid--kpi" style={{ marginBottom: 14 }}>
-        <Kpi icon={IconPatients} color="#018000" label="Patients du jour" value="86" delta="12%" up />
-        <Kpi icon={IconAgenda} color="#976644" label="Rendez-vous" value="34" delta="5%" up />
-        <Kpi icon={IconBed} color="#738f12" label="Lits occupés" value="52 / 72" delta="3%" up />
-        <Kpi icon={IconFinance} color="#9a7b0a" label="Recettes du jour" value="1 240 $" delta="2%" up={false} />
+        <Kpi icon={IconPatients} color="#018000" label={t('dash.kpi.patients')} value="86" delta="12%" up />
+        <Kpi icon={IconAgenda} color="#976644" label={t('dash.kpi.appointments')} value="34" delta="5%" up />
+        <Kpi icon={IconBed} color="#738f12" label={t('dash.kpi.beds')} value="52 / 72" delta="3%" up />
+        <Kpi icon={IconFinance} color="#9a7b0a" label={t('dash.kpi.revenue')} value="1 240 $" delta="2%" up={false} />
       </div>
 
       {/* Recettes + Rendez-vous */}
       <div className="grid grid--2" style={{ marginBottom: 14 }}>
         <div className="card">
           <div className="card__head">
-            <h3>Rendez-vous du jour</h3>
-            <span className="badge badge--info">{APPTS.length} aujourd'hui</span>
+            <h3>{t('dash.appts')}</h3>
+            <span className="badge badge--info">{t('dash.apptsCount', { n: APPTS.length })}</span>
           </div>
           <div className="card__body">
             <div className="list">
@@ -202,7 +211,7 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
                   </div>
                   <div className="list__right">
                     <div className="amount">{a.time}</div>
-                    <span className={`badge badge--${a.st}`}>{a.stl}</span>
+                    <span className={`badge badge--${a.st}`}>{t(`status.${a.stKey}`)}</span>
                   </div>
                 </div>
               ))}
@@ -212,13 +221,13 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
 
         <div className="card">
           <div className="card__head">
-            <h3>Paiements par moyen</h3>
+            <h3>{t('dash.payments')}</h3>
             <span className="badge badge--muted">1 USD = {cdfPerUsd.toLocaleString('fr-FR')} CDF</span>
           </div>
           <div className="card__body">
             <Donut
               data={[
-                { label: 'Espèces (CDF/USD)', value: 42, color: '#006400' },
+                { label: t('dash.cash'), value: 42, color: '#006400' },
                 { label: 'M-Pesa', value: 28, color: '#32cd32' },
                 { label: 'Orange Money', value: 18, color: '#976644' },
                 { label: 'Airtel Money', value: 12, color: '#6f0002' },
@@ -232,8 +241,8 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
       <div className="grid grid--2" style={{ marginBottom: 14 }}>
         <div className="card">
           <div className="card__head">
-            <h3>Occupation des lits</h3>
-            <span className="badge badge--warning">72% global</span>
+            <h3>{t('dash.occupancy')}</h3>
+            <span className="badge badge--warning">{t('dash.occupancyGlobal', { n: 72 })}</span>
           </div>
           <div className="card__body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {BEDS.map((b) => (
@@ -266,25 +275,25 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
 
         <div className="card">
           <div className="card__head">
-            <h3>Transactions récentes</h3>
+            <h3>{t('dash.tx')}</h3>
           </div>
           <div className="card__body">
             <div className="list">
-              {TX.map((t) => (
-                <div className="list__row" key={t.who + t.amount}>
+              {TX.map((tx) => (
+                <div className="list__row" key={tx.who + tx.amount}>
                   <div
                     className="ic-round"
-                    style={{ background: `color-mix(in srgb, ${t.color} 14%, transparent)`, color: t.color }}
+                    style={{ background: `color-mix(in srgb, ${tx.color} 14%, transparent)`, color: tx.color }}
                   >
                     <IconCaisse width={19} height={19} />
                   </div>
                   <div className="list__main">
-                    <div className="list__title">{t.who}</div>
-                    <div className="list__sub">{t.via}</div>
+                    <div className="list__title">{tx.who}</div>
+                    <div className="list__sub">{tx.via}</div>
                   </div>
                   <div className="list__right">
-                    <div className="amount">{t.amount}</div>
-                    <span className="badge badge--success">Payé</span>
+                    <div className="amount">{tx.amount}</div>
+                    <span className="badge badge--success">{t('dash.paid')}</span>
                   </div>
                 </div>
               ))}
@@ -296,21 +305,21 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
       {/* Actions rapides */}
       <div className="card">
         <div className="card__head">
-          <h3>Accès rapide</h3>
+          <h3>{t('dash.quick')}</h3>
         </div>
         <div className="card__body">
           <div className="quick">
             {QUICK.map((q) => {
               const Icon = q.icon;
               return (
-                <button className="quick__tile" key={q.label}>
+                <button className="quick__tile" key={q.key}>
                   <span
                     className="quick__ic"
                     style={{ color: q.color, background: `color-mix(in srgb, ${q.color} 13%, transparent)` }}
                   >
                     <Icon width={24} height={24} />
                   </span>
-                  {q.label}
+                  {t(`svc.${q.key}`)}
                 </button>
               );
             })}
@@ -319,7 +328,7 @@ export function Dashboard({ cdfPerUsd }: { cdfPerUsd: number }) {
       </div>
 
       <div className="helper">
-        <span className="dot-on" /> Hors-ligne prêt · Synchronisation automatique
+        <span className="dot-on" /> {t('dash.offline')}
       </div>
     </>
   );

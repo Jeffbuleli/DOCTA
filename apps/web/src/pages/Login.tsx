@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useAuth } from '../auth';
 import { ApiError } from '../api';
+import { useI18n } from '../i18n';
 import { Footer } from '../components/Footer';
 
 const BrandMark = () => (
@@ -23,6 +24,7 @@ const BrandMark = () => (
 
 export function Login() {
   const { login } = useAuth();
+  const { t, lang, setLang } = useI18n();
   // Pre-rempli avec le compte de demonstration (seed).
   const [tenantSlug, setTenantSlug] = useState('clinique-demo');
   const [email, setEmail] = useState('admin@docta.cd');
@@ -37,11 +39,7 @@ export function Login() {
     try {
       await login(tenantSlug.trim(), email.trim(), password);
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : 'Connexion impossible. Vérifiez que l’API est démarrée.',
-      );
+      setError(err instanceof ApiError ? err.message : t('login.error'));
     } finally {
       setBusy(false);
     }
@@ -49,6 +47,15 @@ export function Login() {
 
   return (
     <div className="auth">
+      <button
+        type="button"
+        className="iconbtn langbtn"
+        aria-label={t('topbar.lang')}
+        onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+        style={{ position: 'absolute', top: 16, right: 16 }}
+      >
+        {lang.toUpperCase()}
+      </button>
       <form className="auth__card" onSubmit={onSubmit}>
         <div className="auth__brand">
           <span style={{ color: 'var(--primary)' }}>
@@ -56,12 +63,12 @@ export function Login() {
           </span>
           <span className="brand-name">Docta</span>
         </div>
-        <div className="auth__tag">Système d'Information Hospitalier</div>
+        <div className="auth__tag">{t('app.tagline')}</div>
 
         {error && <div className="auth__error">{error}</div>}
 
         <div className="field">
-          <label htmlFor="tenant">Établissement</label>
+          <label htmlFor="tenant">{t('login.establishment')}</label>
           <input
             id="tenant"
             className="input"
@@ -75,7 +82,7 @@ export function Login() {
         </div>
 
         <div className="field">
-          <label htmlFor="email">Adresse e-mail</label>
+          <label htmlFor="email">{t('login.email')}</label>
           <input
             id="email"
             className="input"
@@ -90,7 +97,7 @@ export function Login() {
         </div>
 
         <div className="field">
-          <label htmlFor="password">Mot de passe</label>
+          <label htmlFor="password">{t('login.password')}</label>
           <input
             id="password"
             className="input"
@@ -103,12 +110,10 @@ export function Login() {
         </div>
 
         <button className="btn-primary" type="submit" disabled={busy}>
-          {busy ? <span className="spinner" /> : 'Se connecter'}
+          {busy ? <span className="spinner" /> : t('login.signin')}
         </button>
 
-        <div className="auth__hint">
-          Démo : clinique-demo · admin@docta.cd · docta1234
-        </div>
+        <div className="auth__hint">{t('login.demo')}</div>
       </form>
       <Footer />
     </div>

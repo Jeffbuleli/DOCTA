@@ -6,12 +6,12 @@ import { Hospitalisation } from './pages/Hospitalisation';
 import { Placeholder } from './pages/Placeholder';
 import { Login } from './pages/Login';
 import { useAuth } from './auth';
+import { useI18n } from './i18n';
 import { api } from './api';
 import type { PageKey } from './nav';
 import {
   IconPatients,
   IconAgenda,
-  IconHospit,
   IconPharmacie,
   IconLabo,
   IconCaisse,
@@ -21,22 +21,21 @@ import {
 
 const FALLBACK_RATE = 2800;
 
-const PLACEHOLDERS: Record<
-  Exclude<PageKey, 'dashboard'>,
-  { title: string; icon: typeof IconPatients; desc: string }
+const PH_ICONS: Record<
+  Exclude<PageKey, 'dashboard' | 'patients' | 'hospit'>,
+  typeof IconPatients
 > = {
-  patients: { title: 'Patients', icon: IconPatients, desc: 'Dossiers, admissions et identité patient.' },
-  agenda: { title: 'Rendez-vous', icon: IconAgenda, desc: 'Agenda des praticiens et file d’attente.' },
-  hospit: { title: 'Hospitalisation', icon: IconHospit, desc: 'Salles, lits, admissions et transferts.' },
-  pharmacie: { title: 'Pharmacie', icon: IconPharmacie, desc: 'Stock, dispensation et alertes.' },
-  labo: { title: 'Laboratoire', icon: IconLabo, desc: 'Demandes d’analyses et résultats.' },
-  caisse: { title: 'Caisse', icon: IconCaisse, desc: 'Facturation multi-devise et mobile money.' },
-  personnel: { title: 'Personnel', icon: IconPersonnel, desc: 'Équipe, rôles et permanences.' },
-  reglages: { title: 'Réglages', icon: IconSettings, desc: 'Établissement, devises et paramètres.' },
+  agenda: IconAgenda,
+  pharmacie: IconPharmacie,
+  labo: IconLabo,
+  caisse: IconCaisse,
+  personnel: IconPersonnel,
+  reglages: IconSettings,
 };
 
 export function App() {
   const { user, loading, logout } = useAuth();
+  const { t } = useI18n();
   const [page, setPage] = useState<PageKey>('dashboard');
   const [rate, setRate] = useState(FALLBACK_RATE);
 
@@ -58,7 +57,7 @@ export function App() {
   }, [user]);
 
   if (loading) {
-    return <div className="fullscreen-center">Chargement…</div>;
+    return <div className="fullscreen-center">{t('common.loading')}</div>;
   }
 
   if (!user) {
@@ -74,13 +73,17 @@ export function App() {
       onLogout={logout}
     >
       {page === 'dashboard' ? (
-        <Dashboard cdfPerUsd={rate} />
+        <Dashboard cdfPerUsd={rate} userName={user.fullName ?? user.email} />
       ) : page === 'patients' ? (
         <Patients />
       ) : page === 'hospit' ? (
         <Hospitalisation />
       ) : (
-        <Placeholder {...PLACEHOLDERS[page]} />
+        <Placeholder
+          title={t(`page.${page}`)}
+          desc={t(`desc.${page}`)}
+          icon={PH_ICONS[page as keyof typeof PH_ICONS]}
+        />
       )}
     </AppShell>
   );

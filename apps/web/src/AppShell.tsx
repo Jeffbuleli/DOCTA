@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { NAV, BOTTOM_NAV, type PageKey } from './nav';
 import { useTheme } from './theme';
+import { useI18n } from './i18n';
 import { Footer } from './components/Footer';
 import {
   IconMenu,
@@ -52,11 +53,12 @@ function NavList({
   go: (p: PageKey) => void;
   onLogout: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <nav className="nav">
       {NAV.map((group) => (
-        <div key={group.title}>
-          <div className="nav__group">{group.title}</div>
+        <div key={group.key}>
+          <div className="nav__group">{t(`nav.group.${group.key}`)}</div>
           {group.items.map((it) => {
             const Icon = it.icon;
             return (
@@ -66,7 +68,7 @@ function NavList({
                 onClick={() => go(it.key)}
               >
                 <Icon width={20} height={20} />
-                {it.label}
+                {t(`nav.${it.key}`)}
               </button>
             );
           })}
@@ -75,7 +77,7 @@ function NavList({
       <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
         <button className="nav__item" onClick={onLogout}>
           <IconLogout width={20} height={20} />
-          Déconnexion
+          {t('nav.logout')}
         </button>
       </div>
     </nav>
@@ -98,6 +100,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { theme, toggle } = useTheme();
+  const { t, lang, setLang } = useI18n();
   const [drawer, setDrawer] = useState(false);
 
   const go = (p: PageKey) => {
@@ -129,7 +132,7 @@ export function AppShell({
         <header className="topbar">
           <button
             className="iconbtn hamburger"
-            aria-label="Menu"
+            aria-label={t('topbar.menu')}
             onClick={() => setDrawer(true)}
           >
             <IconMenu width={20} height={20} />
@@ -139,18 +142,25 @@ export function AppShell({
 
           <div className="topbar__spacer" />
 
-          <div className="fx-pill" title="Taux du jour">
+          <div className="fx-pill" title={t('topbar.rate')}>
             <span className="usd">1 USD</span>
             <span className="eq">=</span>
             <span className="cdf">{cdfPerUsd.toLocaleString('fr-FR')} CDF</span>
           </div>
 
-          <button className="iconbtn" aria-label="Rechercher">
+          <button
+            className="iconbtn langbtn"
+            aria-label={t('topbar.lang')}
+            onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+          >
+            {lang.toUpperCase()}
+          </button>
+          <button className="iconbtn" aria-label={t('topbar.search')}>
             <IconSearch width={19} height={19} />
           </button>
           <button
             className="iconbtn"
-            aria-label="Changer de theme"
+            aria-label={t('topbar.theme')}
             onClick={toggle}
           >
             {theme === 'dark' ? (
@@ -159,7 +169,7 @@ export function AppShell({
               <IconMoon width={19} height={19} />
             )}
           </button>
-          <button className="iconbtn" aria-label="Notifications">
+          <button className="iconbtn" aria-label={t('topbar.notifications')}>
             <IconBell width={19} height={19} />
             <span className="badge-dot" />
           </button>
@@ -185,13 +195,13 @@ export function AppShell({
               onClick={() => go(it.key)}
             >
               <Icon width={22} height={22} />
-              {it.label}
+              {it.key === 'dashboard' ? t('bottom.home') : t(`nav.${it.key}`)}
             </button>
           );
         })}
         <button
           className="bottomnav__fab"
-          aria-label="Nouvelle action"
+          aria-label={t('common.new')}
           onClick={() => go('patients')}
         >
           <IconPlus width={24} height={24} />
@@ -205,7 +215,7 @@ export function AppShell({
               onClick={() => go(it.key)}
             >
               <Icon width={22} height={22} />
-              {it.label}
+              {t(`nav.${it.key}`)}
             </button>
           );
         })}

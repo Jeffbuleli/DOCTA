@@ -6,6 +6,7 @@ import {
   type Patient,
 } from '../api';
 import { IconSearch } from '../icons';
+import { useI18n } from '../i18n';
 
 export function AdmitModal({
   patient: preselected,
@@ -16,6 +17,7 @@ export function AdmitModal({
   onClose: () => void;
   onAdmitted: () => void;
 }) {
+  const { t } = useI18n();
   const [patient, setPatient] = useState<Patient | null>(preselected ?? null);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<Patient[]>([]);
@@ -59,7 +61,7 @@ export function AdmitModal({
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!patient || !bedId) {
-      setError('Choisissez un patient et un lit.');
+      setError(t('admit.pick'));
       return;
     }
     setError('');
@@ -68,7 +70,7 @@ export function AdmitModal({
       await api.hospital.admit(patient.id, bedId, reason || undefined);
       onAdmitted();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Admission impossible.');
+      setError(err instanceof ApiError ? err.message : t('admit.error'));
     } finally {
       setBusy(false);
     }
@@ -78,7 +80,7 @@ export function AdmitModal({
     <div className="modal-overlay" onClick={onClose}>
       <form className="modal" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
         <div className="modal__head">
-          <h3>Admettre un patient</h3>
+          <h3>{t('admit.title')}</h3>
           <button type="button" className="iconbtn" onClick={onClose} aria-label="Fermer">
             ✕
           </button>
@@ -89,7 +91,7 @@ export function AdmitModal({
           {/* Patient */}
           {patient ? (
             <div className="field" style={{ margin: '0 0 14px' }}>
-              <label>Patient</label>
+              <label>{t('admit.patient')}</label>
               <div
                 style={{
                   display: 'flex',
@@ -109,19 +111,19 @@ export function AdmitModal({
                 </div>
                 {!preselected && (
                   <button type="button" className="btn btn--ghost" onClick={() => setPatient(null)}>
-                    Changer
+                    {t('common.change')}
                   </button>
                 )}
               </div>
             </div>
           ) : (
             <div className="field" style={{ margin: '0 0 14px' }}>
-              <label>Patient *</label>
+              <label>{t('admit.patient')} *</label>
               <div className="search">
                 <IconSearch width={18} height={18} />
                 <input
                   className="input"
-                  placeholder="Rechercher un patient…"
+                  placeholder={t('admit.searchPatient')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   autoCapitalize="none"
@@ -157,7 +159,7 @@ export function AdmitModal({
           {/* Service + lit */}
           <div className="form-grid">
             <div className="field" style={{ margin: 0 }}>
-              <label>Service</label>
+              <label>{t('admit.service')}</label>
               <select
                 className="select"
                 value={wardId}
@@ -166,45 +168,45 @@ export function AdmitModal({
                   setBedId('');
                 }}
               >
-                <option value="">— Choisir —</option>
+                <option value="">{t('common.choose')}</option>
                 {wards.map((w) => (
                   <option key={w.id} value={w.id}>{w.name}</option>
                 ))}
               </select>
             </div>
             <div className="field" style={{ margin: 0 }}>
-              <label>Lit</label>
+              <label>{t('admit.bed')}</label>
               <select
                 className="select"
                 value={bedId}
                 onChange={(e) => setBedId(e.target.value)}
                 disabled={!wardId}
               >
-                <option value="">— Choisir —</option>
+                <option value="">{t('common.choose')}</option>
                 {wardBeds.map((b) => (
                   <option key={b.id} value={b.id}>{b.label} ({b.roomName})</option>
                 ))}
               </select>
             </div>
             <div className="field col-2" style={{ margin: 0 }}>
-              <label>Motif d'admission</label>
+              <label>{t('admit.reason')}</label>
               <input
                 className="input"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="Observation, post-opératoire…"
+                placeholder={t('admit.reasonPh')}
               />
             </div>
           </div>
 
           {wards.length === 0 && (
             <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 12 }}>
-              Aucun lit libre. Créez des services/lits ou libérez un lit.
+              {t('admit.noBeds')}
             </p>
           )}
 
           <button className="btn-primary" type="submit" disabled={busy} style={{ marginTop: 18 }}>
-            {busy ? <span className="spinner" /> : 'Confirmer l’admission'}
+            {busy ? <span className="spinner" /> : t('admit.confirm')}
           </button>
         </div>
       </form>

@@ -1,5 +1,6 @@
 import type { ComponentType, SVGProps } from 'react';
 import { IconPlus } from '../icons';
+import { useI18n } from '../i18n';
 
 export function Placeholder({
   title,
@@ -10,6 +11,7 @@ export function Placeholder({
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   desc: string;
 }) {
+  const { t } = useI18n();
   return (
     <>
       <div className="page-head">
@@ -41,10 +43,9 @@ export function Placeholder({
           >
             <Icon width={36} height={36} />
           </span>
-          <h3 style={{ fontSize: 17 }}>Module en construction</h3>
+          <h3 style={{ fontSize: 17 }}>{t('ph.building')}</h3>
           <p style={{ color: 'var(--muted)', maxWidth: 360, margin: 0 }}>
-            L'écran « {title} » sera bâti sur ce même design. Le socle (API,
-            authentification, multi-devise) est déjà en place côté serveur.
+            {t('ph.body', { title })}
           </p>
           <button
             style={{
@@ -59,7 +60,7 @@ export function Placeholder({
               fontWeight: 700,
             }}
           >
-            <IconPlus width={18} height={18} /> Commencer ce module
+            <IconPlus width={18} height={18} /> {t('ph.start')}
           </button>
         </div>
       </div>

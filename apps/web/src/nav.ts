@@ -30,13 +30,13 @@ export interface NavItem {
 }
 
 export interface NavGroup {
-  title: string;
+  key: string;
   items: NavItem[];
 }
 
 export const NAV: NavGroup[] = [
   {
-    title: 'Principal',
+    key: 'main',
     items: [
       { key: 'dashboard', label: 'Tableau de bord', icon: IconDashboard },
       { key: 'patients', label: 'Patients', icon: IconPatients },
@@ -44,7 +44,7 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
-    title: 'Clinique',
+    key: 'clinical',
     items: [
       { key: 'hospit', label: 'Hospitalisation', icon: IconHospit },
       { key: 'pharmacie', label: 'Pharmacie', icon: IconPharmacie },
@@ -52,7 +52,7 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
-    title: 'Gestion',
+    key: 'management',
     items: [
       { key: 'caisse', label: 'Caisse', icon: IconCaisse },
       { key: 'personnel', label: 'Personnel', icon: IconPersonnel },
