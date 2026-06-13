@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -22,6 +23,10 @@ export class CreateAppointmentDto {
 
   @IsDateString()
   scheduledAt!: string;
+
+  @IsOptional()
+  @IsBoolean()
+  online?: boolean;
 }
 
 export class UpdateStatusDto {

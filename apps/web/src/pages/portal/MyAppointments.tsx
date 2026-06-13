@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useI18n } from '../../i18n';
+import { useAccount } from '../../account';
 import {
   api,
   ApiError,
@@ -9,7 +10,8 @@ import {
 } from '../../api';
 import { navigate } from '../../router';
 import { Footer } from '../../components/Footer';
-import { IconAgenda, IconLogout, IconPlus, IconHospitalBuilding } from '../../icons';
+import { Teleconsult } from '../../components/Teleconsult';
+import { IconAgenda, IconLogout, IconPlus, IconHospitalBuilding, IconVideo } from '../../icons';
 
 const BADGE: Record<string, string> = {
   REQUESTED: 'warning',
@@ -20,8 +22,10 @@ const BADGE: Record<string, string> = {
 
 export function MyAppointments() {
   const { t, lang, setLang } = useI18n();
+  const { account } = useAccount();
   const [list, setList] = useState<PatientAppointment[] | null>(null);
   const [show, setShow] = useState(false);
+  const [tele, setTele] = useState<PatientAppointment | null>(null);
 
   const load = () => api.me.appointments().then(setList).catch(() => setList([]));
   useEffect(() => { load(); }, []);
@@ -77,13 +81,21 @@ export function MyAppointments() {
                   <IconHospitalBuilding width={19} height={19} />
                 </span>
                 <span className="pt-main">
-                  <span className="pt-name">{a.tenant.name}</span>
+                  <span className="pt-name">
+                    {a.tenant.name}
+                    {a.online && <span className="badge badge--info" style={{ marginLeft: 8 }}>{t('rdv.onlineTag')}</span>}
+                  </span>
                   <span className="pt-meta">
                     {fmt(a.scheduledAt)}{a.doctor ? ` · ${t('rdv.with', { name: a.doctor.fullName })}` : ''}{a.reason ? ` · ${a.reason}` : ''}
                   </span>
                 </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <span className={`badge badge--${BADGE[a.status]}`}>{t(`appt.${a.status}`)}</span>
+                  {a.online && (a.status === 'REQUESTED' || a.status === 'CONFIRMED') && (
+                    <button className="btn btn--primary" style={{ height: 34, padding: '0 10px' }} onClick={() => setTele(a)}>
+                      <IconVideo width={16} height={16} /> {t('rdv.join')}
+                    </button>
+                  )}
                   {(a.status === 'REQUESTED' || a.status === 'CONFIRMED') && (
                     <button className="btn" style={{ height: 34, padding: '0 10px', color: 'var(--danger)', borderColor: 'var(--danger-soft)' }} onClick={() => cancel(a)}>
                       {t('agenda.cancel')}
@@ -97,6 +109,13 @@ export function MyAppointments() {
       </main>
 
       {show && <BookModal onClose={() => setShow(false)} onBooked={() => { setShow(false); load(); }} />}
+      {tele && (
+        <Teleconsult
+          appointmentId={tele.id}
+          displayName={account?.fullName ?? 'Patient'}
+          onClose={() => setTele(null)}
+        />
+      )}
       <Footer />
     </div>
   );
@@ -110,6 +129,7 @@ function BookModal({ onClose, onBooked }: { onClose: () => void; onBooked: () =>
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [doctorId, setDoctorId] = useState('');
   const [reason, setReason] = useState('');
+  const [online, setOnline] = useState(false);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('09:00');
   const [error, setError] = useState('');
@@ -141,6 +161,7 @@ function BookModal({ onClose, onBooked }: { onClose: () => void; onBooked: () =>
         doctorAccountId: doctorId || undefined,
         reason: reason || undefined,
         scheduledAt: new Date(`${date}T${time}:00`).toISOString(),
+        online,
       });
       onBooked();
     } catch (err) {
@@ -208,6 +229,13 @@ function BookModal({ onClose, onBooked }: { onClose: () => void; onBooked: () =>
             <div className="field col-2" style={{ margin: 0 }}>
               <label>{t('rdv.reason')}</label>
               <input className="input" value={reason} onChange={(e) => setReason(e.target.value)} />
+            </div>
+            <div className="field col-2" style={{ margin: 0 }}>
+              <label>{t('rdv.type')}</label>
+              <select className="select" value={online ? 'online' : 'inperson'} onChange={(e) => setOnline(e.target.value === 'online')}>
+                <option value="inperson">{t('rdv.inPerson')}</option>
+                <option value="online">{t('rdv.online')}</option>
+              </select>
             </div>
           </div>
 

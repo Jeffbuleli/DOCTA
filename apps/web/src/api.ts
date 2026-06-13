@@ -273,6 +273,7 @@ export interface PatientAppointment {
   id: string;
   reason: string | null;
   scheduledAt: string;
+  online: boolean;
   status: AppointmentStatus;
   tenant: { id: string; name: string; city: string | null };
   doctor: { id: string; fullName: string } | null;
@@ -281,6 +282,7 @@ export interface StaffAppointment {
   id: string;
   reason: string | null;
   scheduledAt: string;
+  online: boolean;
   status: AppointmentStatus;
   account: { id: string; fullName: string; phone: string | null };
   doctor: { id: string; fullName: string } | null;
@@ -469,6 +471,7 @@ export const api = {
       doctorAccountId?: string;
       reason?: string;
       scheduledAt: string;
+      online?: boolean;
     }) =>
       request<PatientAppointment>('/me/appointments', {
         method: 'POST',

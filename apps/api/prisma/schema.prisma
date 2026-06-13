@@ -388,6 +388,7 @@ model Appointment {
   doctorAccountId String? // medecin (optionnel)
   reason          String?
   scheduledAt     DateTime
+  online          Boolean           @default(false) // teleconsultation (salle video)
   status          AppointmentStatus @default(REQUESTED)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt

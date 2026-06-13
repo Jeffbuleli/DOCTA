@@ -62,6 +62,7 @@ export class AppointmentsService {
         doctorAccountId: dto.doctorAccountId,
         reason: dto.reason?.trim(),
         scheduledAt: new Date(dto.scheduledAt),
+        online: dto.online ?? false,
       },
       include: {
         tenant: { select: { id: true, name: true, city: true } },
