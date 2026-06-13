@@ -60,6 +60,9 @@ export function Hub() {
         <div className="page-head">
           <div>
             <h1>{t('phome.greeting', { name: firstName })}</h1>
+            <button className="linklike" onClick={() => navigate(`/profil/${account.id}`)}>
+              {t('hub.profile')} →
+            </button>
           </div>
         </div>
 

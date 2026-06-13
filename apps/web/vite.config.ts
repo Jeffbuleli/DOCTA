@@ -38,7 +38,8 @@ export default defineConfig({
   server: {
     port: Number(process.env.PORT) || 5173,
     proxy: {
-      '/api': 'http://localhost:3000',
+      // Cible de l'API en dev. Surcharge possible : API_PROXY_TARGET=http://localhost:3001
+      '/api': process.env.API_PROXY_TARGET || 'http://localhost:3000',
     },
   },
 });

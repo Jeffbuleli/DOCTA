@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useI18n } from '../i18n';
 import { useActiveTenant } from '../activeTenant';
 import { api, ApiError, type MemberRow } from '../api';
+import { navigate } from '../router';
 import { IconPlus, IconPersonnel } from '../icons';
 
 const ROLES = ['DOCTOR', 'NURSE', 'RECEPTION', 'CASHIER', 'PHARMACIST', 'LAB', 'IMAGING', 'LOGISTICS', 'HR', 'ADMIN'];
@@ -50,7 +51,13 @@ export function Personnel() {
                 {(m.account?.fullName ?? m.invitedEmail ?? '?').slice(0, 2).toUpperCase()}
               </span>
               <span className="pt-main">
-                <span className="pt-name">{m.account?.fullName ?? m.invitedEmail}</span>
+                {m.account ? (
+                  <button className="linklike pt-name" style={{ textAlign: 'left' }} onClick={() => navigate(`/profil/${m.account!.id}`)}>
+                    {m.account.fullName}
+                  </button>
+                ) : (
+                  <span className="pt-name">{m.invitedEmail}</span>
+                )}
                 <span className="pt-meta">
                   {t(`role.${m.role}`)}{m.title ? ` · ${m.title}` : ''}
                 </span>

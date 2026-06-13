@@ -9,6 +9,7 @@ import { MyRecord } from './pages/portal/MyRecord';
 import { VerifyEmail } from './pages/portal/VerifyEmail';
 import { ResetPassword } from './pages/portal/ResetPassword';
 import { HospitalDirectory } from './pages/portal/HospitalDirectory';
+import { ProfilePublic } from './pages/portal/ProfilePublic';
 
 /**
  * Aiguillage racine — identite unique.
@@ -25,6 +26,9 @@ export function Root() {
   if (path === '/verifier-email') return <VerifyEmail />;
   if (path === '/reinitialiser') return <ResetPassword />;
   if (path.startsWith('/hopitaux')) return <HospitalDirectory />;
+  if (path.startsWith('/profil/')) {
+    return <ProfilePublic accountId={path.split('/')[2]} />;
+  }
 
   if (loading) return <div className="fullscreen-center">{t('common.loading')}</div>;
   if (!account) return <PatientAuth />;
