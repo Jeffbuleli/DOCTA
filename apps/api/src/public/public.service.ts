@@ -48,6 +48,7 @@ export class PublicService {
           ? Math.round(haversineKm(lat!, lng!, tn.latitude, tn.longitude) * 10) / 10
           : null;
       return {
+        id: tn.id,
         slug: tn.slug,
         name: tn.name,
         city: tn.city,

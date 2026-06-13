@@ -263,7 +263,31 @@ export interface ShareCode {
   expiresAt: string;
 }
 
+export type AppointmentStatus = 'REQUESTED' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+export interface Doctor {
+  accountId: string;
+  fullName: string;
+  title: string | null;
+}
+export interface PatientAppointment {
+  id: string;
+  reason: string | null;
+  scheduledAt: string;
+  status: AppointmentStatus;
+  tenant: { id: string; name: string; city: string | null };
+  doctor: { id: string; fullName: string } | null;
+}
+export interface StaffAppointment {
+  id: string;
+  reason: string | null;
+  scheduledAt: string;
+  status: AppointmentStatus;
+  account: { id: string; fullName: string; phone: string | null };
+  doctor: { id: string; fullName: string } | null;
+}
+
 export interface HospitalListing {
+  id: string;
   slug: string;
   name: string;
   city: string | null;
@@ -439,6 +463,29 @@ export const api = {
       request<unknown>('/me/profile', { method: 'PATCH', body: JSON.stringify(data) }),
     profile: (accountId: string) =>
       request<PublicProfile>(`/public/profile/${accountId}`, { auth: false }),
+    appointments: () => request<PatientAppointment[]>('/me/appointments'),
+    bookAppointment: (data: {
+      tenantId: string;
+      doctorAccountId?: string;
+      reason?: string;
+      scheduledAt: string;
+    }) =>
+      request<PatientAppointment>('/me/appointments', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    cancelAppointment: (id: string) =>
+      request<PatientAppointment>(`/me/appointments/${id}/cancel`, { method: 'PATCH' }),
+  },
+
+  appointments: {
+    list: () => request<StaffAppointment[]>('/appointments', { tenant: true }),
+    setStatus: (id: string, status: AppointmentStatus) =>
+      request<StaffAppointment>(`/appointments/${id}/status`, {
+        method: 'PATCH',
+        tenant: true,
+        body: JSON.stringify({ status }),
+      }),
   },
 
   records: {
@@ -479,5 +526,7 @@ export const api = {
         auth: false,
       });
     },
+    doctors: (tenantId: string) =>
+      request<Doctor[]>(`/public/hospitals/${tenantId}/doctors`, { auth: false }),
   },
 };

@@ -6,6 +6,7 @@ import { usePath } from './router';
 import { PatientAuth } from './pages/portal/PatientAuth';
 import { Hub } from './pages/portal/Hub';
 import { MyRecord } from './pages/portal/MyRecord';
+import { MyAppointments } from './pages/portal/MyAppointments';
 import { VerifyEmail } from './pages/portal/VerifyEmail';
 import { ResetPassword } from './pages/portal/ResetPassword';
 import { HospitalDirectory } from './pages/portal/HospitalDirectory';
@@ -36,5 +37,6 @@ export function Root() {
   // Connecte : contexte personnel (hopital actif) ou espace patient (Hub)
   if (active) return <StaffSpace />;
   if (path.startsWith('/patient/dossier')) return <MyRecord />;
+  if (path.startsWith('/patient/rdv')) return <MyAppointments />;
   return <Hub />;
 }

@@ -5,6 +5,7 @@ import { Patients } from './pages/Patients';
 import { Hospitalisation } from './pages/Hospitalisation';
 import { Caisse } from './pages/Caisse';
 import { Personnel } from './pages/Personnel';
+import { Agenda } from './pages/Agenda';
 import { Placeholder } from './pages/Placeholder';
 import { useAccount } from './account';
 import { useActiveTenant } from './activeTenant';
@@ -13,7 +14,6 @@ import { api } from './api';
 import type { PageKey } from './nav';
 import {
   IconPatients,
-  IconAgenda,
   IconPharmacie,
   IconLabo,
   IconSettings,
@@ -22,10 +22,9 @@ import {
 const FALLBACK_RATE = 2800;
 
 const PH_ICONS: Record<
-  Exclude<PageKey, 'dashboard' | 'patients' | 'hospit' | 'caisse' | 'personnel'>,
+  Exclude<PageKey, 'dashboard' | 'patients' | 'hospit' | 'caisse' | 'personnel' | 'agenda'>,
   typeof IconPatients
 > = {
-  agenda: IconAgenda,
   pharmacie: IconPharmacie,
   labo: IconLabo,
   reglages: IconSettings,
@@ -67,6 +66,8 @@ export function StaffSpace() {
         <Caisse />
       ) : page === 'personnel' ? (
         <Personnel />
+      ) : page === 'agenda' ? (
+        <Agenda />
       ) : (
         <Placeholder
           title={t(`page.${page}`)}

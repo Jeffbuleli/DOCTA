@@ -33,6 +33,7 @@ model Tenant {
   exchangeRates ExchangeRate[]
   wards         Ward[]
   memberships   Membership[]
+  appointments  Appointment[]
 }
 
 enum Role {
@@ -87,9 +88,11 @@ model Account {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  links       AccountPatientLink[]
-  shareGrants ShareGrant[]
-  memberships Membership[]
+  links              AccountPatientLink[]
+  shareGrants        ShareGrant[]
+  memberships        Membership[]
+  appointments       Appointment[]        @relation("PatientAppointments")
+  doctorAppointments Appointment[]        @relation("DoctorAppointments")
 }
 
 enum MembershipStatus {
@@ -365,4 +368,35 @@ model ShareAccess {
   grant ShareGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
 
   @@index([grantId])
+}
+
+/// =====================  RENDEZ-VOUS  =====================
+
+enum AppointmentStatus {
+  REQUESTED // demande par le patient
+  CONFIRMED // confirme par l'hopital
+  CANCELLED
+  COMPLETED
+}
+
+/// Rendez-vous : un patient (compte global) dans un hopital, eventuellement
+/// avec un medecin precis (lui-meme un compte, membre de l'hopital).
+model Appointment {
+  id              String            @id @default(cuid())
+  tenantId        String
+  accountId       String // patient
+  doctorAccountId String? // medecin (optionnel)
+  reason          String?
+  scheduledAt     DateTime
+  status          AppointmentStatus @default(REQUESTED)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  account Account  @relation("PatientAppointments", fields: [accountId], references: [id], onDelete: Cascade)
+  doctor  Account? @relation("DoctorAppointments", fields: [doctorAccountId], references: [id])
+
+  @@index([tenantId, scheduledAt])
+  @@index([accountId])
+  @@index([doctorAccountId])
 }

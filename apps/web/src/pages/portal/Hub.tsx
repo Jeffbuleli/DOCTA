@@ -17,7 +17,7 @@ import {
 const TILES = [
   { key: 'findHospital', icon: IconHospitalBuilding, color: '#018000', route: '/hopitaux' },
   { key: 'myRecord', icon: IconMedicalRecord, color: '#738f12', route: '/patient/dossier' },
-  { key: 'appointments', icon: IconAgenda, color: '#976644' },
+  { key: 'appointments', icon: IconAgenda, color: '#976644', route: '/patient/rdv' },
   { key: 'teleconsult', icon: IconVideo, color: '#0891b2' },
 ] as const;
 
